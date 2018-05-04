@@ -891,17 +891,32 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
     # define min and max order statistics to plot
     min_k = int(np.ceil(len(k_h_arr)**theta1)) - 1
     max_k = int(np.floor(len(k_h_arr)**theta2)) - 1
-
+    # check if estimators' values are not too off in these bounds
+    min_k_index = (np.abs(k_sh_arr - min_k)).argmin()
+    max_k_index = (np.abs(k_sh_arr - max_k)).argmin()
+    if (xi_sh_arr[min_k_index] <= -3 or xi_sh_arr[min_k_index] >= 3):
+        indices_to_plot_sh = np.where((xi_sh_arr <= 3) & (xi_sh_arr >= -3))
+    elif (xi_sh_arr[max_k_index] <= -3 or xi_sh_arr[max_k_index] >= 3):
+        indices_to_plot_sh = np.where((xi_sh_arr <= 3) & (xi_sh_arr >= -3))
+    else:
+        indices_to_plot_sh = np.where((k_sh_arr <= max_k) & (k_sh_arr >= min_k))
     axes[1,0].set_xlabel(r"Number of Order Statistics $\kappa$", fontsize = 15)
     axes[1,0].set_ylabel(r"Estimated $\hat{\xi}$", fontsize = 15)    
     # plot smooth Hill
-    indices_to_plot = np.where((k_sh_arr <= max_k) & (k_sh_arr >= min_k))
-    axes[1,0].plot(k_sh_arr[indices_to_plot], xi_sh_arr[indices_to_plot],
+    
+    axes[1,0].plot(k_sh_arr[indices_to_plot_sh], xi_sh_arr[indices_to_plot_sh],
                    color = "#b3de69", alpha = 0.8, label = "Smooth Hill",
                    zorder = 10)
+
     # plot adjusted Hill
-    indices_to_plot = np.where((k_h_arr <= max_k) & (k_h_arr >= min_k))
-    axes[1,0].plot(k_h_arr[indices_to_plot], xi_h_arr[indices_to_plot],
+    # check if estimators' values are not too off in these bounds
+    if (xi_h_arr[min_k] <= -3 or xi_h_arr[min_k] >= 3):
+        indices_to_plot_h = np.where((xi_h_arr <= 3) & (xi_h_arr >= -3))
+    elif (xi_h_arr[max_k] <= -3 or xi_h_arr[max_k] >= 3):
+        indices_to_plot_h = np.where((xi_h_arr <= 3) & (xi_h_arr >= -3))
+    else:
+        indices_to_plot_h = np.where((k_h_arr <= max_k) & (k_h_arr >= min_k))
+    axes[1,0].plot(k_h_arr[indices_to_plot_h], xi_h_arr[indices_to_plot_h],
                    color = "#fb8072", alpha = 0.8, label = "Adjusted Hill",
                    zorder = 10)
     if bootstrap_flag:
@@ -917,14 +932,14 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
     axes[1,1].set_xlabel(r"Number of Order Statistics $\kappa$", fontsize = 15)
     axes[1,1].set_ylabel(r"Estimated $\hat{\xi}$", fontsize = 15) 
     axes[1,1].set_xscale("log")   
+    
     # plot smooth Hill
-    indices_to_plot = np.where((k_sh_arr <= max_k) & (k_sh_arr >= min_k))
-    axes[1,1].plot(k_sh_arr[indices_to_plot], xi_sh_arr[indices_to_plot],
+    axes[1,1].plot(k_sh_arr[indices_to_plot_sh], xi_sh_arr[indices_to_plot_sh],
                    color = "#b3de69", alpha = 0.8, label = "Smooth Hill",
                    zorder = 10)
     # plot adjusted Hill
     indices_to_plot = np.where((k_h_arr <= max_k) & (k_h_arr >= min_k))
-    axes[1,1].plot(k_h_arr[indices_to_plot], xi_h_arr[indices_to_plot],
+    axes[1,1].plot(k_h_arr[indices_to_plot_h], xi_h_arr[indices_to_plot_h],
                    color = "#fb8072", alpha = 0.8, label = "Adjusted Hill",
                    zorder = 10)
     if bootstrap_flag:
@@ -940,13 +955,26 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
     axes[2,0].set_ylabel(r"Estimated $\hat{\xi}$", fontsize = 15)
 
     #plot Pickands
-    indices_to_plot = np.where((k_p_arr <= max_k) & (k_p_arr >= min_k))
-    axes[2,0].plot(k_p_arr[indices_to_plot], xi_p_arr[indices_to_plot],
+    min_k_index = (np.abs(k_p_arr - min_k)).argmin()
+    max_k_index = (np.abs(k_p_arr - max_k)).argmin()
+    if (xi_p_arr[min_k_index] <= -3 or xi_p_arr[min_k_index] >= 3):
+        indices_to_plot_p = np.where((xi_p_arr <= 3) & (xi_p_arr >= -3))
+    elif (xi_p_arr[max_k_index] <= -3 or xi_p_arr[max_k_index] >= 3):
+        indices_to_plot_p = np.where((xi_p_arr <= 3) & (xi_p_arr >= -3))
+    else:
+        indices_to_plot_p = np.where((k_p_arr <= max_k) & (k_p_arr >= min_k))
+    axes[2,0].plot(k_p_arr[indices_to_plot_p], xi_p_arr[indices_to_plot_p],
                    color = "#bc80bd", alpha = 0.8, label = "Pickands",
                    zorder = 10)
     #plot moments
-    indices_to_plot = np.where((xi_m_arr <= 3) & (xi_m_arr >= -3))
-    axes[2,0].plot(k_m_arr[indices_to_plot], xi_m_arr[indices_to_plot],
+    if (xi_m_arr[min_k] <= -3 or xi_m_arr[min_k] >= 3):
+        indices_to_plot_m = np.where((xi_m_arr <= 3) & (xi_m_arr >= -3))
+    elif (xi_m_arr[max_k] <= -3 or xi_m_arr[max_k] >= 3):
+        indices_to_plot_m = np.where((xi_m_arr <= 3) & (xi_m_arr >= -3))
+    else:
+        indices_to_plot_m = np.where((k_m_arr <= max_k) & (k_m_arr >= min_k))
+    
+    axes[2,0].plot(k_m_arr[indices_to_plot_m], xi_m_arr[indices_to_plot_m],
                    color = "#8dd3c7", alpha = 0.8, label = "Moments",
                    zorder = 10)
     if bootstrap_flag:
@@ -957,8 +985,16 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
                            +str(np.round([xi_m_arr[k_m_star-1]][0], decimals = 3))\
                            +r"$")
     #plot kernel-type
-    indices_to_plot = np.where((xi_k_arr <= 3) & (xi_k_arr >= -3))
-    axes[2,0].plot(k_k_arr[indices_to_plot], xi_k_arr[indices_to_plot],
+    min_k_index = (np.abs(k_k_arr - min_k)).argmin()
+    max_k_index = (np.abs(k_k_arr - max_k)).argmin()
+    if (xi_k_arr[min_k_index] <= -3 or xi_k_arr[min_k_index] >= 3):
+        indices_to_plot_k = np.where((xi_k_arr <= 3) & (xi_k_arr >= -3))
+    elif (xi_k_arr[max_k_index] <= -3 or xi_k_arr[max_k_index] >= 3):
+        indices_to_plot_k = np.where((xi_k_arr <= 3) & (xi_k_arr >= -3))
+    else:
+        indices_to_plot_k = list(range(min_k_index, max_k_index))
+    #indices_to_plot_k = np.where((xi_k_arr <= 3) & (xi_k_arr >= -3))
+    axes[2,0].plot(k_k_arr[indices_to_plot_k], xi_k_arr[indices_to_plot_k],
                    color = "#fdb462", alpha = 0.8, label = "Kernel",
                    zorder = 10)
     if bootstrap_flag:
@@ -973,14 +1009,13 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
     axes[2,1].set_xlabel(r"Number of Order Statistics $\kappa$", fontsize = 15)
     axes[2,1].set_ylabel(r"Estimated $\hat{\xi}$", fontsize = 15)
     axes[2,1].set_xscale("log")
+
     #plot Pickands
-    indices_to_plot = np.where((k_p_arr <= max_k) & (k_p_arr >= min_k))
-    axes[2,1].plot(k_p_arr[indices_to_plot], xi_p_arr[indices_to_plot],
+    axes[2,1].plot(k_p_arr[indices_to_plot_p], xi_p_arr[indices_to_plot_p],
                    color = "#bc80bd", alpha = 0.8, label = "Pickands",
                    zorder = 10)
     #plot moments
-    indices_to_plot = np.where((xi_m_arr <= 3) & (xi_m_arr >= -3))
-    axes[2,1].plot(k_m_arr[indices_to_plot], xi_m_arr[indices_to_plot],
+    axes[2,1].plot(k_m_arr[indices_to_plot_m], xi_m_arr[indices_to_plot_m],
                    color = "#8dd3c7", alpha = 0.8, label = "Moments",
                    zorder = 10)
     if bootstrap_flag:
@@ -991,8 +1026,7 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
                            +str(np.round([xi_m_arr[k_m_star-1]][0], decimals = 3))\
                            +r"$")
     #plot kernel-type
-    indices_to_plot = np.where((xi_k_arr <= 3) & (xi_k_arr >= -3))
-    axes[2,1].plot(k_k_arr[indices_to_plot], xi_k_arr[indices_to_plot],
+    axes[2,1].plot(k_k_arr[indices_to_plot_k], xi_k_arr[indices_to_plot_k],
                    color = "#fdb462", alpha = 0.8, label = "Kernel",
                    zorder = 10)
     if bootstrap_flag:
@@ -1228,11 +1262,13 @@ def main():
                         type = float, default = 0.9)
     parser.add_argument("--theta1",
                         help = "Lower bound of plotting range, defined as\
-                        k_min = ceil(n^theta1), (default = 0.01).",
+                        k_min = ceil(n^theta1), (default = 0.01).\
+                        Overwritten if plots behave badly within the range.",
                         type = float, default = 0.01)
     parser.add_argument("--theta2",
                         help = "Upper bound of plotting range, defined as\
-                        k_max = floor(n^theta2), (default = 0.99).",
+                        k_max = floor(n^theta2), (default = 0.99).\
+                        Overwritten if plots behave badly within the range.",
                         type = float, default = 0.99)
     parser.add_argument("--diagplots",
                         help = "Flag to switch on/off plotting AMSE statistics\

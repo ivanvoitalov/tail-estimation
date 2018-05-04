@@ -59,9 +59,9 @@ Although at the first glance the plots produced by the script may seem to be com
 
 ### Changing _epsstop_ parameter
 
-### Analyzing non-network data
-
 ### Noise and why is it added
+
+### Analyzing non-network data
 
 ## Implemented Estimators
 
@@ -137,10 +137,12 @@ optional arguments:
                         agree with each other (default = 0.9).
 
   --theta1              Lower bound of plotting range, defined as k_min =
-                        ceil(n^theta1), (default = 0.01).
+                        ceil(n^theta1), (default = 0.01). Overwritten if plots
+                        behave badly within the range.
 
   --theta2              Upper bound of plotting range, defined as k_max =
-                        floor(n^theta2), (default = 0.99).
+                        floor(n^theta2), (default = 0.99). Overwritten if plots
+                        behave badly within the range.
 
   --diagplots           Flag to switch on/off plotting AMSE statistics for
                         Hill/moments/kernel-type double-bootstrap algorithm.
