@@ -224,8 +224,10 @@ def hill_estimator(ordered_data,
         print "**********"
     else:
         k_star, xi_star = None, None
+        x1_arr, n1_amse, k1, max_index1 = 4*[None]
+        x2_arr, n2_amse, k2, max_index2 = 4*[None]
     results = [k_arr, xi_arr, k_star, xi_star, x1_arr, n1_amse, k1, max_index1,\
-              x2_arr, n2_amse, k2, max_index2]
+               x2_arr, n2_amse, k2, max_index2]
     return results
 
 def smooth_hill_estimator(ordered_data, r_smooth = 2):
@@ -420,6 +422,8 @@ def moments_estimator(ordered_data,
         print "**********"
     else:
         k_star, xi_star = None, None
+        x1_arr, n1_amse, k1, max_index1 = 4*[None]
+        x2_arr, n2_amse, k2, max_index2 = 4*[None]
     results = [k_arr, xi_arr, k_star, xi_star, x1_arr, n1_amse, k1, max_index1,\
               x2_arr, n2_amse, k2, max_index2]
     return results
@@ -636,6 +640,8 @@ def kernel_type_estimator(ordered_data, hsteps, alpha = 0.6,
         print "**********"
     else:
         k_star, xi_star = None, None
+        x1_arr, n1_amse, h1, max_index1 = 4*[None]
+        x2_arr, n2_amse, h2, max_index2 = 4*[None]
         k_arr = np.floor(h_arr * n)
     results = [np.array(k_arr), xi_arr, k_star, xi_star, x1_arr, n1_amse, h1, max_index1,\
               x2_arr, n2_amse, h2, max_index2]
@@ -816,7 +822,8 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
     xi_k_star = kernel_type_results[3]
     x1_k_arr, n1_k_amse, h1, max_k_index1 = kernel_type_results[4:8]
     x2_k_arr, n2_k_amse, h2, max_k_index2 = kernel_type_results[8:]
-    k_k1_star = np.argmin(np.abs(k_k_arr - k_k_star))
+    if bootstrap_flag:
+        k_k1_star = np.argmin(np.abs(k_k_arr - k_k_star))
     if savedata == 1:
         with open(os.path.join(output_dir+"/"+output_name+"_kern_plot.dat"), "w") as f:
             for i in xrange(len(k_k_arr)):
@@ -885,7 +892,7 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
     min_k = int(np.ceil(len(k_h_arr)**theta1)) - 1
     max_k = int(np.floor(len(k_h_arr)**theta2)) - 1
 
-    axes[1,0].set_xlabel(r"Number of Order Statistics $k$", fontsize = 15)
+    axes[1,0].set_xlabel(r"Number of Order Statistics $\kappa$", fontsize = 15)
     axes[1,0].set_ylabel(r"Estimated $\hat{\xi}$", fontsize = 15)    
     # plot smooth Hill
     indices_to_plot = np.where((k_sh_arr <= max_k) & (k_sh_arr >= min_k))
@@ -897,16 +904,17 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
     axes[1,0].plot(k_h_arr[indices_to_plot], xi_h_arr[indices_to_plot],
                    color = "#fb8072", alpha = 0.8, label = "Adjusted Hill",
                    zorder = 10)
-    axes[1,0].scatter([k_h_arr[k_h_star-1]], [xi_h_arr[k_h_star-1]],
-                   color = "#fb8072", marker = "*", s = 100,
-                   edgecolor = "black", zorder = 20, 
-                   label = r"$\widehat{\xi}^{Hill}="\
-                       +str(np.round([xi_h_arr[k_h_star-1]][0], decimals = 3))\
-                       +r"$")
+    if bootstrap_flag:
+        axes[1,0].scatter([k_h_arr[k_h_star-1]], [xi_h_arr[k_h_star-1]],
+                       color = "#fb8072", marker = "*", s = 100,
+                       edgecolor = "black", zorder = 20, 
+                       label = r"$\widehat{\xi}^{Hill}="\
+                           +str(np.round([xi_h_arr[k_h_star-1]][0], decimals = 3))\
+                           +r"$")
     axes[1,0].legend(loc = "best")
 
     
-    axes[1,1].set_xlabel(r"Number of Order Statistics $k$", fontsize = 15)
+    axes[1,1].set_xlabel(r"Number of Order Statistics $\kappa$", fontsize = 15)
     axes[1,1].set_ylabel(r"Estimated $\hat{\xi}$", fontsize = 15) 
     axes[1,1].set_xscale("log")   
     # plot smooth Hill
@@ -919,15 +927,16 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
     axes[1,1].plot(k_h_arr[indices_to_plot], xi_h_arr[indices_to_plot],
                    color = "#fb8072", alpha = 0.8, label = "Adjusted Hill",
                    zorder = 10)
-    axes[1,1].scatter([k_h_arr[k_h_star-1]], [xi_h_arr[k_h_star-1]],
-                   color = "#fb8072", marker = "*", s = 100,
-                   edgecolor = "black", zorder = 20, 
-                   label = r"$\widehat{\xi}^{Hill}="\
-                       +str(np.round([xi_h_arr[k_h_star-1]][0], decimals = 3))\
-                       +r"$")
+    if bootstrap_flag:
+        axes[1,1].scatter([k_h_arr[k_h_star-1]], [xi_h_arr[k_h_star-1]],
+                       color = "#fb8072", marker = "*", s = 100,
+                       edgecolor = "black", zorder = 20, 
+                       label = r"$\widehat{\xi}^{Hill}="\
+                           +str(np.round([xi_h_arr[k_h_star-1]][0], decimals = 3))\
+                           +r"$")
     axes[1,1].legend(loc = "best")
 
-    axes[2,0].set_xlabel(r"Number of Order Statistics $k$", fontsize = 15)
+    axes[2,0].set_xlabel(r"Number of Order Statistics $\kappa$", fontsize = 15)
     axes[2,0].set_ylabel(r"Estimated $\hat{\xi}$", fontsize = 15)
 
     #plot Pickands
@@ -940,26 +949,28 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
     axes[2,0].plot(k_m_arr[indices_to_plot], xi_m_arr[indices_to_plot],
                    color = "#8dd3c7", alpha = 0.8, label = "Moments",
                    zorder = 10)
-    axes[2,0].scatter([k_m_arr[k_m_star-1]], [xi_m_arr[k_m_star-1]],
-                   color = "#8dd3c7", marker = "*", s = 100,
-                   edgecolor = "black", zorder = 20, 
-                   label = r"$\widehat{\xi}^{Moments}="\
-                       +str(np.round([xi_m_arr[k_m_star-1]][0], decimals = 3))\
-                       +r"$")
+    if bootstrap_flag:
+        axes[2,0].scatter([k_m_arr[k_m_star-1]], [xi_m_arr[k_m_star-1]],
+                       color = "#8dd3c7", marker = "*", s = 100,
+                       edgecolor = "black", zorder = 20, 
+                       label = r"$\widehat{\xi}^{Moments}="\
+                           +str(np.round([xi_m_arr[k_m_star-1]][0], decimals = 3))\
+                           +r"$")
     #plot kernel-type
     indices_to_plot = np.where((xi_k_arr <= 3) & (xi_k_arr >= -3))
     axes[2,0].plot(k_k_arr[indices_to_plot], xi_k_arr[indices_to_plot],
                    color = "#fdb462", alpha = 0.8, label = "Kernel",
                    zorder = 10)
-    axes[2,0].scatter([k_k_arr[k_k1_star-1]], [xi_k_arr[k_k1_star-1]],
-                   color = "#fdb462", marker = "*", s = 100,
-                   edgecolor = "black", zorder = 20, 
-                   label = r"$\widehat{\xi}^{Kernel}="\
-                       +str(np.round([xi_k_arr[k_k1_star-1]][0], decimals = 3))\
-                       +r"$")
+    if bootstrap_flag:
+        axes[2,0].scatter([k_k_arr[k_k1_star-1]], [xi_k_arr[k_k1_star-1]],
+                       color = "#fdb462", marker = "*", s = 100,
+                       edgecolor = "black", zorder = 20, 
+                       label = r"$\widehat{\xi}^{Kernel}="\
+                           +str(np.round([xi_k_arr[k_k1_star-1]][0], decimals = 3))\
+                           +r"$")
     axes[2,0].legend(loc = "best")
 
-    axes[2,1].set_xlabel(r"Number of Order Statistics $k$", fontsize = 15)
+    axes[2,1].set_xlabel(r"Number of Order Statistics $\kappa$", fontsize = 15)
     axes[2,1].set_ylabel(r"Estimated $\hat{\xi}$", fontsize = 15)
     axes[2,1].set_xscale("log")
     #plot Pickands
@@ -972,23 +983,25 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
     axes[2,1].plot(k_m_arr[indices_to_plot], xi_m_arr[indices_to_plot],
                    color = "#8dd3c7", alpha = 0.8, label = "Moments",
                    zorder = 10)
-    axes[2,1].scatter([k_m_arr[k_m_star-1]], [xi_m_arr[k_m_star-1]],
-                   color = "#8dd3c7", marker = "*", s = 100,
-                   edgecolor = "black", zorder = 20, 
-                   label = r"$\widehat{\xi}^{Moments}="\
-                       +str(np.round([xi_m_arr[k_m_star-1]][0], decimals = 3))\
-                       +r"$")
+    if bootstrap_flag:
+        axes[2,1].scatter([k_m_arr[k_m_star-1]], [xi_m_arr[k_m_star-1]],
+                       color = "#8dd3c7", marker = "*", s = 100,
+                       edgecolor = "black", zorder = 20, 
+                       label = r"$\widehat{\xi}^{Moments}="\
+                           +str(np.round([xi_m_arr[k_m_star-1]][0], decimals = 3))\
+                           +r"$")
     #plot kernel-type
     indices_to_plot = np.where((xi_k_arr <= 3) & (xi_k_arr >= -3))
     axes[2,1].plot(k_k_arr[indices_to_plot], xi_k_arr[indices_to_plot],
                    color = "#fdb462", alpha = 0.8, label = "Kernel",
                    zorder = 10)
-    axes[2,1].scatter([k_k_arr[k_k1_star-1]], [xi_k_arr[k_k1_star-1]],
-                   color = "#fdb462", marker = "*", s = 100,
-                   edgecolor = "black", zorder = 20, 
-                   label = r"$\widehat{\xi}^{Kernel}="\
-                       +str(np.round([xi_k_arr[k_k1_star-1]][0], decimals = 3))\
-                       +r"$")
+    if bootstrap_flag:
+        axes[2,1].scatter([k_k_arr[k_k1_star-1]], [xi_k_arr[k_k1_star-1]],
+                       color = "#fdb462", marker = "*", s = 100,
+                       edgecolor = "black", zorder = 20, 
+                       label = r"$\widehat{\xi}^{Kernel}="\
+                           +str(np.round([xi_k_arr[k_k1_star-1]][0], decimals = 3))\
+                           +r"$")
     axes[2,1].legend(loc = "best")
 
     if diagn_plots:

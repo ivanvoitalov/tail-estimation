@@ -1,6 +1,6 @@
 # Tail Index Estimation for Degree Sequences of Complex Networks
 
-[summary](#script-summary)
+## Summary
 
 This script is intended to be a single-file simple solution to the tail index estimation problem in complex networks. It consists of several well-established estimators combined into one toolbox along with some useful plotting routines that usually help to analyze a given degree distribution.
 
@@ -25,27 +25,45 @@ where **k** is a node's degree and **n(k)** is the number of nodes with such deg
 ## Simple Usage Example
 
 Here we provide the simplest usage example of the _tail-estimation_ script. 
-Suppose we want to compute the tail index of a degree distribution of the [CAIDA network](http://konect.uni-koblenz.de/networks/as-caida20071105) provided by [KONECT database](http://konect.uni-koblenz.de/). We first convert the network in the form of an edge list to the format of _degree counts_ as indicated above. The converted data can be found under the _Examples_ directory under the **CAIDA_KONECT.dat** name. Then we run the _tail-estimation.py_ script as follows:
+Suppose we want to compute the tail index of a degree distribution of the [CAIDA network](http://konect.uni-koblenz.de/networks/as-caida20071105) provided by [KONECT database](http://konect.uni-koblenz.de/). We first convert the network from the format of an edge list to the format of _degree counts_ as indicated above. The converted data can be found under the _Examples_ directory under the **CAIDA_KONECT.dat** name. Then we run the _tail-estimation.py_ script as follows:
 ```
 python tail-estimation.py /path/to/degree/sequence /path/to/output/plots/file
 ```
 
-This will produce an image file with plots as well as some STDOUT messages reporting estimated tail indices. An example of such image for the CAIDA network is given below:
+This will produce a collection of plots as well as some STDOUT messages reporting estimated tail indices. An example of plots generated for the CAIDA network is given below:
 ![CAIDA Output](https://raw.githubusercontent.com/ivanvoitalov/tail-estimation/master/Figures/CAIDA_output.png)
 
-## Command Line Options
+# What does it mean?!
+
+Although at the first glance the plots produced by the script may seem to be complicated, it is very easy to interpret them for your network! The main thing to notice is that all tail index estimates are plotted in terms of parameter $\xi$ that is related to the tail index of the PDF of degree distribution $\gamma$ as follows: $\xi = \frac{1}{\gamma - 1}$. Here we list the description of what is exactly shown on each subfigure, starting from the top left one:
+1. Log-binned probability density function (PDF) of a given degree sequence.
+2. Complementary cumulative distribution function (CCDF) of a given degree sequence.
+3. Smooth and adjusted Hill estimates of $\xi = \frac{1}{\gamma - 1}$ parameter on a linear scale as a function of the number of included degree sequence order statistic $\kappa$. Star marker shows best estimate of the tail index $\xi$ based on the double-bootstrap procedure for Hill estimator.
+4. Smooth and adjusted Hill estimates of $\xi$ parameter on a semilog scale as a function of the number of included degree sequence order statistic $\kappa$. Star marker shows best estimate of the tail index $\xi$ based on the double-bootstrap procedure for Hill estimator.
+5. Pickands, moments and kernel-type estimates of $\xi$ parameter on a linear scale as a function of the number of included degree sequence order statistic $\kappa$. Star markers show best estimate of the tail index $\xi$ based on the double-bootstrap procedure for moments and kernel-type estimators.
+6. Pickands, moments and kernel-type estimates of $\xi$ parameter on a semilog scale as a function of the number of included degree sequence order statistic $\kappa$. Star markers show best estimate of the tail index $\xi$ based on the double-bootstrap procedure for moments and kernel-type estimators.
+
+## Advanced Examples
+
+# Generating diagnostic plots
+
+# Changing _epsstop_ parameter
+
+# Analyzing non-network data
+
+# Noise and why is it added
 
 ## Implemented Estimators
 
 Currently several classical estimators for tail index estimation are implemented:
-* Hill estimator, including smoothed Hill estimator and adjusted Hill estimator;
+* Hill estimator, including smoothed Hill estimator;
 * moments estimator;
 * Pickands estimator;
 * kernel-type estimator.
 
 ## Double-bootstrap for Optimal Threshold Estimation
 
-The package implement double-bootstrap estimation of the optimal order statistic for several estimators:
+The package implements double-bootstrap estimation of the optimal order statistic for several estimators:
 * Hill;
 * Moments;
 * Kernel-type.
@@ -54,6 +72,4 @@ Hill double-boostrap: [Danielsson et al. (2001)](https://www.riskresearch.org/pa
 Moments double-bootstrap: [Draisma et al. (1999)](https://link.springer.com/article/10.1023/A:1009900215680)
 Kernel-type double-bootstrap: [Groeneboom et al. (2003)](https://www.jstor.org/stable/3448443)
 
-## Usage Example
-
-## Additional Info
+## Command Line Options
