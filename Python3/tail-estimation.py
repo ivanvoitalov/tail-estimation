@@ -245,8 +245,8 @@ def smooth_hill_estimator(ordered_data, r_smooth = 2):
         k = i
         cum_sum += M1[k]
         if (k+1) % (r_smooth) == 0:
-            xi_arr[int(k+1)/int(r_smooth)] = cum_sum
-            cum_sum -= M1[int(k+1)/int(r_smooth)]
+            xi_arr[int(k+1)//int(r_smooth)] = cum_sum
+            cum_sum -= M1[int(k+1)//int(r_smooth)]
     xi_arr = xi_arr/bin_lengths
     return k_arr, xi_arr
 
