@@ -20,7 +20,7 @@ The script processes a degree sequence in the form of:
 ```
 k n(k)
 ```
-where **k** is a node's degree and **n(k)** is the number of nodes with such degree in the network.
+where **k** is a node's degree and **n(k)** is the number of nodes with such degree in the network. Note that these two number are whitespace-separated.
 
 ## Simple Usage Example
 
@@ -30,10 +30,20 @@ Suppose we want to compute the tail index of a degree distribution of the [CAIDA
 python tail-estimation.py /path/to/degree/sequence /path/to/output/plots/file
 ```
 
-This will produce a collection of plots as well as some STDOUT messages reporting estimated tail indices. An example of plots generated for the CAIDA network is given below:
+This will produce a collection of plots as well as some STDOUT messages reporting estimated tail indices. Most users would be interested in just one-number tail index estimates according to three estimators we have implemented so far. They are reported to the STDOUT in the following form (for the CAIDA network example):
+```
+**********
+Adjusted Hill estimated gamma: 2.09313899261
+**********
+Moments estimated gamma: 2.11325330189
+**********
+Kernel-type estimated gamma: 2.13032486828
+**********
+```
+An example of plots generated for the CAIDA network is given below:
 ![CAIDA Output](https://raw.githubusercontent.com/ivanvoitalov/tail-estimation/master/Figures/CAIDA_output.png)
 
-# What does it mean?!
+### What does it mean?!
 
 Although at the first glance the plots produced by the script may seem to be complicated, it is very easy to interpret them for your network! The main thing to notice is that all tail index estimates are plotted in terms of parameter $\xi$ that is related to the tail index of the PDF of degree distribution $\gamma$ as follows: $\xi = \frac{1}{\gamma - 1}$. Here we list the description of what is exactly shown on each subfigure, starting from the top left one:
 1. Log-binned probability density function (PDF) of a given degree sequence.
@@ -45,13 +55,13 @@ Although at the first glance the plots produced by the script may seem to be com
 
 ## Advanced Examples
 
-# Generating diagnostic plots
+### Generating diagnostic plots
 
-# Changing _epsstop_ parameter
+### Changing _epsstop_ parameter
 
-# Analyzing non-network data
+### Analyzing non-network data
 
-# Noise and why is it added
+### Noise and why is it added
 
 ## Implemented Estimators
 
