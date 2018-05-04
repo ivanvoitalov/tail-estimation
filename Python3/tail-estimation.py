@@ -1171,7 +1171,7 @@ def main():
                         help = "Path to a data sequence.", type = str)
     parser.add_argument("output_file_path",
                         help = "Output path for plots. All plots are saved\
-                        in PDF format, so .pdf suffix is appended.", type = str)
+                        in PDF format.", type = str)
     parser.add_argument("--nbins",
                         help = "Number of bins for degree\
                         distribution (default = 30)", type = int,

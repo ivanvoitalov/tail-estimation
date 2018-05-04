@@ -83,3 +83,73 @@ Moments double-bootstrap: [Draisma et al. (1999)](https://link.springer.com/arti
 Kernel-type double-bootstrap: [Groeneboom et al. (2003)](https://www.jstor.org/stable/3448443)
 
 ## Command Line Options
+
+The script is equiped with a variety of optional arguments that help to study degree sequences in more details. We list all arguments that can be provided to the script in this section.
+
+```
+positional arguments:
+  sequence_file_path    Path to a data sequence.
+
+  output_file_path      Output path for plots. All plots are saved in PDF
+                        format.
+
+optional arguments:
+  -h, --help            show help message and exit
+
+  --nbins               Number of bins for degree distribution (default = 30)
+
+  --rsmooth             Smoothing parameter for smooth Hill estimator (default
+                        = 2)
+
+  --alphakernel         Alpha parameter used for kernel-type estimator. Should
+                        be greater than 0.5 (default = 0.6).
+
+  --hsteps              Parameter to select number of bandwidth steps for
+                        kernel-type estimator, (default = 200).
+
+  --noise               Switch on/off uniform noise in range [-5*10^(-p),
+                        5*10^(-p)] that is added to each data point. Used for
+                        integer-valued sequences with p = 1 (default = 1).
+
+  --pnoise              Uniform noise parameter corresponding to the rounding
+                        error of the data sequence. For integer values it
+                        equals to 1. (default = 1).
+
+  --bootstrap           Flag to switch on/off double-bootstrap algorithm for
+                        defining optimal order statistic of Hill, moments and
+                        kernel-type estimators. (default = 1)
+
+  --tbootstrap          Fraction of bootstrap samples in the 2nd bootstrap
+                        defined as n^tbootstrap, i.e., for n^0.5 a sqrt(n) is
+                        the size of a single bootstrap sample (default = 0.5).
+
+  --rbootstrap          Number of bootstrap resamplings used in double-
+                        bootstrap. Note that each sample results are stored in
+                        an array, so be careful about the memory (default =
+                        500).
+
+  --epsstop             Upper bound for order statistic to consider for
+                        double-bootstrap AMSE minimizer defined as max_k =
+                        epsstop*n, so that for epsstop = 0.5 only first half
+                        order statistics of the bootstrap samples will be
+                        considered in AMSE minimization procedure. Use it with
+                        diagnostic AMSE plots if estimators' results don't
+                        agree with each other (default = 0.9).
+
+  --theta1              Lower bound of plotting range, defined as k_min =
+                        ceil(n^theta1), (default = 0.01).
+
+  --theta2              Upper bound of plotting range, defined as k_max =
+                        floor(n^theta2), (default = 0.99).
+
+  --diagplots           Flag to switch on/off plotting AMSE statistics for
+                        Hill/moments/kernel-type double-bootstrap algorithm.
+                        Used for diagnostics when double-bootstrap provides
+                        unstable results. Can be used to find proper epsstop
+                        parameter. (default = 0).
+
+  --verbose             Verbosity of bootstrap procedure. (default = 0).
+
+  --savedata            Flag to save data files in the directory with plots.
+                        (default = 0)
+```
