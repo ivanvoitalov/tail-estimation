@@ -13,10 +13,17 @@ from matplotlib import pyplot as plt
 # =========================================
 
 def add_uniform_noise(data_sequence, p = 1):
-    """Function to add uniform random noise to a given dataset.
+    """
+    Function to add uniform random noise to a given dataset.
+    Uniform noise in range [-5*10^(-p), 5*10^p] is added to each
+    data entry.
 
-    !!! Add documentation !!!
+    Args:
+        data_sequence: numpy array of data to be processed.
+        p: integer parameter controlling noise amplitude.
 
+    Returns:
+        numpy array with noise-added entries.
     """
     if p < 1:
         print "Parameter p should be greater or equal to 1."
@@ -25,11 +32,19 @@ def add_uniform_noise(data_sequence, p = 1):
     randomized_data_sequence = data_sequence + noise
     return randomized_data_sequence
 
-# function to get log-binned distribution of a list
-def get_distribution(data_sequence, number_of_bins = 30):
-    """Function to get a log-binned distribution of a given dataset.
 
-    !!! Add documentation !!!
+def get_distribution(data_sequence, number_of_bins = 30):
+    """
+    Function to get a log-binned distribution of a given dataset.
+
+    Args:
+        data_sequence: numpy array with data to calculate
+                       log-binned PDF on.
+        number_of_bins: number of logarithmic bins to use.
+
+    Returns:
+        x, y: numpy arrays containing midpoints of bins
+              and corresponding PDF values.
 
     """
     # define the support of the distribution
@@ -52,9 +67,16 @@ def get_distribution(data_sequence, number_of_bins = 30):
     return x, y
 
 def get_ccdf(degree_sequence):
-    """Function to get CCDF of the list of degrees
-       
-       !!! Add documentation !!!
+    """
+    Function to get CCDF of the list of degrees.
+    
+    Args:
+        degree_sequence: numpy array of nodes' degrees.
+
+    Returns:
+        uniques: unique degree values met in the sequence.
+        CCDF: CCDF values corresponding to the unique values
+              from the 'uniques' array.
     """
     N = len(degree_sequence)
     p = 1. * np.arange(N) / (N)
@@ -67,7 +89,18 @@ def get_ccdf(degree_sequence):
 # ================================================
 def get_moments_estimates_1(ordered_data):
     """
-    !!! Add documentation !!!
+    Function to calculate first moments array given an ordered data
+    sequence. Decreasing ordering is required.
+
+    Args:
+        ordered_data: numpy array of ordered data for which
+                      the 1st moment (Hill estimator)
+                      is calculated.
+    Returns:
+        M1: numpy array of 1st moments (Hill estimator)
+            corresponding to all possible order statistics
+            of the dataset.
+
     """
     logs_1 = np.log(ordered_data)
     logs_1_cumsum = np.cumsum(logs_1[:-1])
@@ -77,7 +110,21 @@ def get_moments_estimates_1(ordered_data):
 
 def get_moments_estimates_2(ordered_data):
     """
-    !!! Add documentation !!!
+    Function to calculate first and second moments arrays
+    given an ordered data sequence. 
+    Decreasing ordering is required.
+
+    Args:
+        ordered_data: numpy array of ordered data for which
+                      the 1st (Hill estimator) and 2nd moments 
+                      are calculated.
+    Returns:
+        M1: numpy array of 1st moments (Hill estimator)
+            corresponding to all possible order statistics
+            of the dataset.
+        M2: numpy array of 2nd moments corresponding to all 
+            possible order statistics of the dataset.
+
     """
     logs_1 = np.log(ordered_data)
     logs_2 = (np.log(ordered_data))**2
@@ -91,7 +138,23 @@ def get_moments_estimates_2(ordered_data):
 
 def get_moments_estimates_3(ordered_data):
     """
-    !!! Add documentation !!!
+    Function to calculate first, second and third moments 
+    arrays given an ordered data sequence. 
+    Decreasing ordering is required.
+
+    Args:
+        ordered_data: numpy array of ordered data for which
+                      the 1st (Hill estimator), 2nd and 3rd moments 
+                      are calculated.
+    Returns:
+        M1: numpy array of 1st moments (Hill estimator)
+            corresponding to all possible order statistics
+            of the dataset.
+        M2: numpy array of 2nd moments corresponding to all 
+            possible order statistics of the dataset.
+        M3: numpy array of 3rd moments corresponding to all 
+            possible order statistics of the dataset.
+
     """
     logs_1 = np.log(ordered_data)
     logs_2 = (np.log(ordered_data))**2
@@ -117,9 +180,48 @@ def hill_dbs(ordered_data, t_bootstrap = 0.5,
             r_bootstrap = 500, eps_stop = 1.0,
             verbose = False, diagn_plots = False):
     """
-        !!! Add documentation !!!
+        Function to perform double-bootstrap procedure for
+        Hill estimator.
+
+        Args:
+            ordered_data: numpy array for which double-bootstrap
+                          is performed. Decreasing ordering is required.
+            t_bootstrap:  parameter controlling the size of the 2nd
+                          bootstrap. Defined from n2 = n^(t_bootstrap).
+            r_bootstrap:  number of bootstrap resamplings for the 1st and 2nd
+                          bootstraps.
+            eps_stop:     parameter controlling range of AMSE minimization.
+                          Defined as the fraction of order statistics to consider
+                          during the AMSE minimization step.
+            verbose:      flag controlling bootstrap verbosity. 
+            diagn_plots:  flag to switch on/off generation of AMSE diagnostic
+                          plots.
+
+        Returns:
+            k_star:     number of order statistics optimal for estimation
+                        according to the double-bootstrap procedure.
+            x1_arr:     array of fractions of order statistics used for the
+                        1st bootstrap sample.
+            n1_amse:    array of AMSE values produced by the 1st bootstrap
+                        sample.
+            k1_min:     value of fraction of order statistics corresponding
+                        to the minimum of AMSE for the 1st bootstrap sample.
+            max_index1: index of the 1st bootstrap sample's order statistics
+                        array corresponding to the minimization boundary set
+                        by eps_stop parameter.
+            x2_arr:     array of fractions of order statistics used for the
+                        2nd bootstrap sample.
+            n2_amse:    array of AMSE values produced by the 2nd bootstrap
+                        sample.
+            k2_min:     value of fraction of order statistics corresponding
+                        to the minimum of AMSE for the 2nd bootstrap sample.
+            max_index2: index of the 2nd bootstrap sample's order statistics
+                        array corresponding to the minimization boundary set
+                        by eps_stop parameter.
+
     """
-    print "Performing Hill double-bootstrap..."
+    if verbose:
+        print "Performing Hill double-bootstrap..."
     n = len(ordered_data)
     eps_bootstrap = 0.5*(1+np.log(int(t_bootstrap*n))/np.log(n))
     n1 = int(n**eps_bootstrap)
@@ -195,9 +297,40 @@ def hill_estimator(ordered_data,
                    bootstrap = True, t_bootstrap = 0.5,
                    r_bootstrap = 500, verbose = False,
                    diagn_plots = False, eps_stop = 0.99):
-    """Function to calculate Hill estimates.
-        
-    !!! Add documentation !!!
+    """
+    Function to calculate Hill estimator for a given dataset.
+    If bootstrap flag is True, double-bootstrap procedure
+    for estimation of the optimal number of order statistics is
+    performed.
+
+    Args:
+        ordered_data: numpy array for which tail index estimation
+                      is performed. Decreasing ordering is required.
+        bootstrap:    flag to switch on/off double-bootstrap procedure.
+        t_bootstrap:  parameter controlling the size of the 2nd
+                      bootstrap. Defined from n2 = n^(t_bootstrap).
+        r_bootstrap:  number of bootstrap resamplings for the 1st and 2nd
+                      bootstraps.
+        eps_stop:     parameter controlling range of AMSE minimization.
+                      Defined as the fraction of order statistics to consider
+                      during the AMSE minimization step.
+        verbose:      flag controlling bootstrap verbosity. 
+        diagn_plots:  flag to switch on/off generation of AMSE diagnostic
+                      plots.
+
+    Returns:
+        results: list containing an array of order statistics,
+                 an array of corresponding tail index estimates,
+                 the optimal order statistic estimated by double-
+                 bootstrap and the corresponding tail index,
+                 an array of fractions of order statistics used for
+                 the 1st bootstrap sample with an array of corresponding
+                 AMSE values, value of fraction of order statistics
+                 corresponding to the minimum of AMSE for the 1st bootstrap
+                 sample, index of the 1st bootstrap sample's order statistics
+                 array corresponding to the minimization boundary set
+                 by eps_stop parameter; and the same characteristics for the
+                 2nd bootstrap sample.
     """
     k_arr = np.arange(1, len(ordered_data))
     xi_arr = get_moments_estimates_1(ordered_data)
@@ -231,8 +364,20 @@ def hill_estimator(ordered_data,
     return results
 
 def smooth_hill_estimator(ordered_data, r_smooth = 2):
-    """Function to calculate smooth Hill estimator.
-    !!! Add documentation !!!
+    """
+    Function to calculate smooth Hill estimator for a
+    given ordered dataset.
+
+    Args:
+        ordered_data: numpy array for which tail index estimation
+                      is performed. Decreasing ordering is required.
+        r_smooth:     integer parameter controlling the width
+                      of smoothing window. Typically small
+                      value such as 2 or 3.
+    Returns:
+        k_arr:  numpy array of order statistics based on the data provided.
+        xi_arr: numpy array of tail index estimates corresponding to 
+                the order statistics array k_arr.
     """
     n = len(ordered_data)
     M1 = get_moments_estimates_1(ordered_data)
@@ -255,10 +400,21 @@ def smooth_hill_estimator(ordered_data, r_smooth = 2):
 # ===================================================
 
 def moments_dbs_prefactor(xi_n, n1, k1):
-    """ Function to calculate pre-factor used in 
-        moments double-bootstrap procedure.
+    """ 
+    Function to calculate pre-factor used in moments
+    double-bootstrap procedure.
 
-        !!! Add documentation !!!
+    Args:
+        xi_n: moments tail index estimate corresponding to
+              sqrt(n)-th order statistic.
+        n1:   size of the 1st bootstrap in double-bootstrap
+              procedure.
+        k1:   estimated optimal order statistic based on the 1st
+              bootstrap sample.
+
+    Returns:
+        prefactor: constant used in estimation of the optimal
+                   stopping order statistic for moments estimator.
     """
     def V_sq(xi_n):
         if xi_n >= 0:
@@ -318,9 +474,50 @@ def moments_dbs(ordered_data, xi_n, t_bootstrap = 0.5,
                 r_bootstrap = 500, eps_stop = 1.0,
                 verbose = False, diagn_plots = False):
     """
-    !!! Add documentation !!!
+    Function to perform double-bootstrap procedure for 
+    moments estimator.
+
+    Args:
+        ordered_data: numpy array for which double-bootstrap
+                      is performed. Decreasing ordering is required.
+        xi_n:         moments tail index estimate corresponding to
+                      sqrt(n)-th order statistic.
+        t_bootstrap:  parameter controlling the size of the 2nd
+                      bootstrap. Defined from n2 = n^(t_bootstrap).
+        r_bootstrap:  number of bootstrap resamplings for the 1st and 2nd
+                      bootstraps.
+        eps_stop:     parameter controlling range of AMSE minimization.
+                      Defined as the fraction of order statistics to consider
+                      during the AMSE minimization step.
+        verbose:      flag controlling bootstrap verbosity. 
+        diagn_plots:  flag to switch on/off generation of AMSE diagnostic
+                      plots.
+        
+
+    Returns:
+        k_star:     number of order statistics optimal for estimation
+                    according to the double-bootstrap procedure.
+        x1_arr:     array of fractions of order statistics used for the
+                    1st bootstrap sample.
+        n1_amse:    array of AMSE values produced by the 1st bootstrap
+                    sample.
+        k1_min:     value of fraction of order statistics corresponding
+                    to the minimum of AMSE for the 1st bootstrap sample.
+        max_index1: index of the 1st bootstrap sample's order statistics
+                    array corresponding to the minimization boundary set
+                    by eps_stop parameter.
+        x2_arr:     array of fractions of order statistics used for the
+                    2nd bootstrap sample.
+        n2_amse:    array of AMSE values produced by the 2nd bootstrap
+                    sample.
+        k2_min:     value of fraction of order statistics corresponding
+                    to the minimum of AMSE for the 2nd bootstrap sample.
+        max_index2: index of the 2nd bootstrap sample's order statistics
+                    array corresponding to the minimization boundary set
+                    by eps_stop parameter.
     """
-    print "Performing moments double-bootstrap..."
+    if verbose:
+        print "Performing moments double-bootstrap..."
     n = len(ordered_data)
     eps_bootstrap = 0.5*(1+np.log(int(t_bootstrap*n))/np.log(n))
 
@@ -391,9 +588,40 @@ def moments_estimator(ordered_data,
                       bootstrap = True, t_bootstrap = 0.5,
                       r_bootstrap = 500, verbose = False,
                       diagn_plots = False, eps_stop = 0.99):
-    """Function to get moments estimator
+    """
+    Function to calculate moments estimator for a given dataset.
+    If bootstrap flag is True, double-bootstrap procedure
+    for estimation of the optimal number of order statistics is
+    performed.
 
-    !!! Add documentation !!!
+    Args:
+        ordered_data: numpy array for which tail index estimation
+                      is performed. Decreasing ordering is required.
+        bootstrap:    flag to switch on/off double-bootstrap procedure.
+        t_bootstrap:  parameter controlling the size of the 2nd
+                      bootstrap. Defined from n2 = n^(t_bootstrap).
+        r_bootstrap:  number of bootstrap resamplings for the 1st and 2nd
+                      bootstraps.
+        eps_stop:     parameter controlling range of AMSE minimization.
+                      Defined as the fraction of order statistics to consider
+                      during the AMSE minimization step.
+        verbose:      flag controlling bootstrap verbosity. 
+        diagn_plots:  flag to switch on/off generation of AMSE diagnostic
+                      plots.
+
+    Returns:
+        results: list containing an array of order statistics,
+                 an array of corresponding tail index estimates,
+                 the optimal order statistic estimated by double-
+                 bootstrap and the corresponding tail index,
+                 an array of fractions of order statistics used for
+                 the 1st bootstrap sample with an array of corresponding
+                 AMSE values, value of fraction of order statistics
+                 corresponding to the minimum of AMSE for the 1st bootstrap
+                 sample, index of the 1st bootstrap sample's order statistics
+                 array corresponding to the minimization boundary set
+                 by eps_stop parameter; and the same characteristics for the
+                 2nd bootstrap sample.
     """
     n =  len(ordered_data)
     M1, M2 = get_moments_estimates_2(ordered_data)
@@ -433,9 +661,26 @@ def moments_estimator(ordered_data,
 # =======================================================
 
 def get_biweight_kernel_estimates(ordered_data, hsteps, alpha):
-    """Function to calculate biweight kernel-type estimates for tail index.
+    """
+    Function to calculate biweight kernel-type estimates for tail index.
+    Biweight kernel is defined as:
+    phi(u) = (15/8) * (1 - u^2)^2
 
-        !!! Add documentation !!!
+    Args:
+        ordered_data: numpy array for which tail index estimation
+                      is performed. Decreasing ordering is required.
+        hsteps:       parameter controlling number of bandwidth steps
+                      of the kernel-type estimator.
+        alpha:        parameter controlling the amount of "smoothing"
+                      for the kernel-type estimator. Should be greater
+                      than 0.5.
+
+    Returns:
+        h_arr:  numpy array of fractions of order statistics included
+                in kernel-type tail index estimation.
+        xi_arr: numpy array with tail index estimated corresponding
+                to different fractions of order statistics included
+                listed in h_arr array.
     """
     n = len(ordered_data)
     logs = np.log(ordered_data)
@@ -471,9 +716,26 @@ def get_biweight_kernel_estimates(ordered_data, hsteps, alpha):
 
 
 def get_triweight_kernel_estimates(ordered_data, hsteps, alpha):
-    """Function to calculate triweight kernel-type estimates for tail index.
+    """
+    Function to calculate triweight kernel-type estimates for tail index.
+    Triweight kernel is defined as:
+    phi(u) = (35/16) * (1 - u^2)^3
 
-        !!! Add documentation !!!
+    Args:
+        ordered_data: numpy array for which tail index estimation
+                      is performed. Decreasing ordering is required.
+        hsteps:       parameter controlling number of bandwidth steps
+                      of the kernel-type estimator.
+        alpha:        parameter controlling the amount of "smoothing"
+                      for the kernel-type estimator. Should be greater
+                      than 0.5.
+
+    Returns:
+        h_arr:  numpy array of fractions of order statistics included
+                in kernel-type tail index estimation.
+        xi_arr: numpy array with tail index estimated corresponding
+                to different fractions of order statistics included
+                listed in h_arr array.
     """
     n = len(ordered_data)
     logs = np.log(ordered_data)
@@ -518,12 +780,54 @@ def get_triweight_kernel_estimates(ordered_data, hsteps, alpha):
 def kernel_type_dbs(ordered_data, hsteps, t_bootstrap = 0.5,
                     r_bootstrap = 500, alpha = 0.6, eps_stop = 1.0,
                     verbose = False, diagn_plots = False):
-    """Function to perform double-bootstrap for kernel-type estimator.
-
-    !!! Add documentation !!!
-
     """
-    print "Performing kernel double-bootstrap..."
+    Function to perform double-bootstrap procedure for 
+    moments estimator.
+
+    Args:
+        ordered_data: numpy array for which double-bootstrap
+                      is performed. Decreasing ordering is required.
+        hsteps:       parameter controlling number of bandwidth steps
+                      of the kernel-type estimator.
+        t_bootstrap:  parameter controlling the size of the 2nd
+                      bootstrap. Defined from n2 = n^(t_bootstrap).
+        r_bootstrap:  number of bootstrap resamplings for the 1st and 2nd
+                      bootstraps.
+        alpha:        parameter controlling the amount of "smoothing"
+                      for the kernel-type estimator. Should be greater
+                      than 0.5.
+        eps_stop:     parameter controlling range of AMSE minimization.
+                      Defined as the fraction of order statistics to consider
+                      during the AMSE minimization step.
+        verbose:      flag controlling bootstrap verbosity. 
+        diagn_plots:  flag to switch on/off generation of AMSE diagnostic
+                      plots.
+        
+
+    Returns:
+        h_star:       fraction of order statistics optimal for estimation
+                      according to the double-bootstrap procedure.
+        x1_arr:       array of fractions of order statistics used for the
+                      1st bootstrap sample.
+        n1_amse:      array of AMSE values produced by the 1st bootstrap
+                      sample.
+        h1:           value of fraction of order statistics corresponding
+                      to the minimum of AMSE for the 1st bootstrap sample.
+        max_k_index1: index of the 1st bootstrap sample's order statistics
+                      array corresponding to the minimization boundary set
+                      by eps_stop parameter.
+        x2_arr:       array of fractions of order statistics used for the
+                      2nd bootstrap sample.
+        n2_amse:      array of AMSE values produced by the 2nd bootstrap
+                      sample.
+        h2:           value of fraction of order statistics corresponding
+                      to the minimum of AMSE for the 2nd bootstrap sample.
+        max_k_index2: index of the 2nd bootstrap sample's order statistics
+                      array corresponding to the minimization boundary set
+                      by eps_stop parameter.
+    """
+    if verbose:
+        print "Performing kernel double-bootstrap..."
     n = len(ordered_data)
     eps_bootstrap = 0.5*(1+np.log(int(t_bootstrap*n))/np.log(n))
     
@@ -604,9 +908,45 @@ def kernel_type_estimator(ordered_data, hsteps, alpha = 0.6,
                          bootstrap = True, t_bootstrap = 0.5,
                          r_bootstrap = 500, verbose = False,
                          diagn_plots = False, eps_stop = 0.99):
-    """Function to calculate biweight kernel-type estimates.
-        
-    !!! Add documentation !!!
+    """
+    Function to calculate kernel-type estimator for a given dataset.
+    If bootstrap flag is True, double-bootstrap procedure
+    for estimation of the optimal number of order statistics is
+    performed.
+
+    Args:
+        ordered_data: numpy array for which tail index estimation
+                      is performed. Decreasing ordering is required.
+        hsteps:       parameter controlling number of bandwidth steps
+                      of the kernel-type estimator.
+        alpha:        parameter controlling the amount of "smoothing"
+                      for the kernel-type estimator. Should be greater
+                      than 0.5.
+        bootstrap:    flag to switch on/off double-bootstrap procedure.
+        t_bootstrap:  parameter controlling the size of the 2nd
+                      bootstrap. Defined from n2 = n^(t_bootstrap).
+        r_bootstrap:  number of bootstrap resamplings for the 1st and 2nd
+                      bootstraps.
+        eps_stop:     parameter controlling range of AMSE minimization.
+                      Defined as the fraction of order statistics to consider
+                      during the AMSE minimization step.
+        verbose:      flag controlling bootstrap verbosity. 
+        diagn_plots:  flag to switch on/off generation of AMSE diagnostic
+                      plots.
+
+    Returns:
+        results: list containing an array of fractions of order statistics,
+                 an array of corresponding tail index estimates,
+                 the optimal order statistic estimated by double-
+                 bootstrap and the corresponding tail index,
+                 an array of fractions of order statistics used for
+                 the 1st bootstrap sample with an array of corresponding
+                 AMSE values, value of fraction of order statistics
+                 corresponding to the minimum of AMSE for the 1st bootstrap
+                 sample, index of the 1st bootstrap sample's order statistics
+                 array corresponding to the minimization boundary set
+                 by eps_stop parameter; and the same characteristics for the
+                 2nd bootstrap sample.
     """
 
     n = len(ordered_data)
@@ -629,7 +969,6 @@ def kernel_type_estimator(ordered_data, hsteps, alpha = 0.6,
             h_star, x1_arr, n1_amse, h1, max_index1, x2_arr, n2_amse, h2, max_index2 = results
         
         #get k index which corresponds to h_star
-        #k_star = int(np.ceil(hsteps*h_star))
         k_star = np.argmin(np.abs(h_arr - h_star))
         xi_star = xi_arr[k_star]
         k_arr = []
@@ -652,16 +991,19 @@ def kernel_type_estimator(ordered_data, hsteps, alpha = 0.6,
 # ====================================================
 
 def pickands_estimator(ordered_data):
-    """Function to calculate Pickands estimator for the tail index.
+    """
+    Function to calculate Pickands estimator for the tail index.
 
     Args:
-        ordered_data (array): a numpy float 1d array containing data.
+        ordered_data: numpy array for which tail index estimation
+                      is performed. Decreasing ordering is required.
 
     Returns:
-        k_arr (array): array containing order statistics used for
-            Pickands estimator calculation.
-        xi_arr (array): array containing tail index estimates corresponding
-            to k-order statistics provided in k_arr.
+        k_arr:  array containing order statistics used for
+                Pickands estimator calculation. Note that only estimates
+                up to floor(n/4)-th order statistic can be calculated.
+        xi_arr: array containing tail index estimates corresponding
+                to k-order statistics provided in k_arr.
     """
     n = len(ordered_data)
     indices_k = np.arange(1, int(np.floor(n/4.))+1)
@@ -682,9 +1024,45 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
                r_smooth, alpha, hsteps, bootstrap_flag, t_bootstrap,
                r_bootstrap, diagn_plots, eps_stop, theta1, theta2, 
                verbose, noise_flag, p_noise, savedata):
-    """ Function to create plots and save tail index estimation data.
+    """ 
+    Function to create plots and save tail index estimation data.
 
-    !!! Add documentation !!!
+    Args:
+        ordered_data:     numpy array for which tail index estimation
+                          is performed. Decreasing ordering is required.
+        output_file_path: file path to which plots should be saved.
+        number_of_bins:   number of log-bins for degree distribution.
+        r_smooth:         integer parameter controlling the width
+                          of smoothing window. Typically small
+                          value such as 2 or 3.
+        alpha:            parameter controlling the amount of "smoothing"
+                          for the kernel-type estimator. Should be greater
+                          than 0.5.
+        hsteps:           parameter controlling number of bandwidth steps
+                          of the kernel-type estimator.
+        bootstrap_flag:   flag to switch on/off double-bootstrap procedure.
+        t_bootstrap:      parameter controlling the size of the 2nd
+                          bootstrap. Defined from n2 = n^(t_bootstrap).
+        r_bootstrap:      number of bootstrap resamplings for the 1st and 2nd
+                          bootstraps.
+        diagn_plots:      flag to switch on/off generation of AMSE diagnostic
+                          plots.
+        eps_stop:         parameter controlling range of AMSE minimization.
+                          Defined as the fraction of order statistics to
+                          consider during the AMSE minimization step.
+        theta1:           Lower bound of plotting range, defined as
+                          k_min = ceil(n^theta1).
+                          Overwritten if plots behave badly within the range.
+        theta2:           Upper bound of plotting range, defined as
+                          k_max = floor(n^theta2).
+                          Overwritten if plots behave badly within the range.
+        verbose:          flag controlling bootstrap verbosity.
+        noise_flag:       Switch on/off uniform noise in range
+                          [-5*10^(-p), 5*10^(-p)] that is added to each
+                          data point. Used for integer-valued sequences
+                          with p = 1 (default = 1).
+        p_noise:          integer parameter controlling noise amplitude.
+        savedata:         Flag to save data files in the directory with plots.
     """
     output_dir = os.path.dirname(os.path.realpath(output_file_path))
     output_name = os.path.splitext(os.path.basename(output_file_path))[0]
@@ -910,9 +1288,9 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
 
     # plot adjusted Hill
     # check if estimators' values are not too off in these bounds
-    if (xi_h_arr[min_k] <= -3 or xi_h_arr[min_k] >= 3):
+    if (xi_h_arr[min_k-1] <= -3 or xi_h_arr[min_k-1] >= 3):
         indices_to_plot_h = np.where((xi_h_arr <= 3) & (xi_h_arr >= -3))
-    elif (xi_h_arr[max_k] <= -3 or xi_h_arr[max_k] >= 3):
+    elif (xi_h_arr[max_k-1] <= -3 or xi_h_arr[max_k-1] >= 3):
         indices_to_plot_h = np.where((xi_h_arr <= 3) & (xi_h_arr >= -3))
     else:
         indices_to_plot_h = np.where((k_h_arr <= max_k) & (k_h_arr >= min_k))
@@ -967,9 +1345,9 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
                    color = "#bc80bd", alpha = 0.8, label = "Pickands",
                    zorder = 10)
     #plot moments
-    if (xi_m_arr[min_k] <= -3 or xi_m_arr[min_k] >= 3):
+    if (xi_m_arr[min_k-1] <= -3 or xi_m_arr[min_k-1] >= 3):
         indices_to_plot_m = np.where((xi_m_arr <= 3) & (xi_m_arr >= -3))
-    elif (xi_m_arr[max_k] <= -3 or xi_m_arr[max_k] >= 3):
+    elif (xi_m_arr[max_k-1] <= -3 or xi_m_arr[max_k-1] >= 3):
         indices_to_plot_m = np.where((xi_m_arr <= 3) & (xi_m_arr >= -3))
     else:
         indices_to_plot_m = np.where((k_m_arr <= max_k) & (k_m_arr >= min_k))
