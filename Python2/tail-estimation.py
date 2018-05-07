@@ -66,7 +66,7 @@ def get_distribution(data_sequence, number_of_bins = 30):
     y = [k for i,k in enumerate(y) if i not in drop_indices]
     return x, y
 
-def get_ccdf(degree_sequence):
+def get_ccdf(degree_sequence, discrete = True):
     """
     Function to get CCDF of the list of degrees.
     
@@ -80,9 +80,17 @@ def get_ccdf(degree_sequence):
     """
     N = len(degree_sequence)
     p = 1. * np.arange(N) / (N)
+    sorted_data = degree_sequence
+    sorted_data[::-1].sort()
     #if data is discrete, trim non-important repeating values
-    uniques, indices = np.unique(degree_sequence, return_index = True)
-    return uniques, 1. - p[indices]
+    indices = []
+    for i in xrange(1, N):
+        if sorted_data[i] != sorted_data[i-1]:
+            indices.append(i-1)
+    #take care of the last value
+    indices.append(N-1)
+    uniques = degree_sequence[indices]
+    return uniques, p[indices]
 
 # ================================================
 # ========== Hill Tail Index Estimation ==========
@@ -1079,7 +1087,7 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
         with open(os.path.join(output_dir+"/"+output_name+"_pdf.dat"), "w") as f:
             for i in xrange(len(x_pdf)):
                 f.write(str(x_pdf[i]) + " " + str(y_pdf[i]) + "\n")
-    
+
     # calculate CCDF
     if verbose:
         print "Calculating CCDF..."
@@ -1092,11 +1100,12 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
         with open(os.path.join(output_dir+"/"+output_name+"_ccdf.dat"), "w") as f:
             for i in xrange(len(x_ccdf)):
                 f.write(str(x_ccdf[i]) + " " + str(y_ccdf[i]) + "\n")
-    
+
+    # add noise if needed
     if noise_flag:
         ordered_data = add_uniform_noise(ordered_data, p = p_noise)
     ordered_data[::-1].sort()
-
+    
     # perform Pickands estimation
     if verbose:
         print "Calculating Pickands..."
@@ -1582,8 +1591,8 @@ def main():
     parser.add_argument("sequence_file_path",
                         help = "Path to a data sequence.", type = str)
     parser.add_argument("output_file_path",
-                        help = "Output path for plots. All plots are saved\
-                        in PDF format.", type = str)
+                        help = "Output path for plots. Use either PDF or\
+                        PNG format.", type = str)
     parser.add_argument("--nbins",
                         help = "Number of bins for degree\
                         distribution (default = 30)", type = int,
