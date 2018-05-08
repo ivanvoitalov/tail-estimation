@@ -2,7 +2,7 @@
 
 ## Summary
 
-This script is intended to be a single-file simple solution to the tail index estimation problem in complex networks. It consists of several well-established estimators combined into one toolbox along with some useful plotting routines that usually help to analyze a given degree distribution.
+This script is intended to be a single-file simple solution to the complex networks degree sequence _tail index estimation_. It consists of several well-established estimators combined into one toolbox along with some useful plotting routines that usually help to analyze a given degree distribution.
 
 ## Dependencies
 
@@ -20,11 +20,15 @@ The script processes a degree sequence in the form of:
 ```
 k n(k)
 ```
-where **k** is a node's degree and **n(k)** is the number of nodes with such degree in the network. Note that these two number are whitespace-separated.
+where **k** is a node's degree and **n(k)** is the number of nodes with such degree in the network. Note that these two numbers are whitespace-separated.
 
 ## Simple Usage Example
 
-Here we provide the simplest usage example of the _tail-estimation_ script. 
+Here we provide the simplest usage example of the _tail-estimation_ script:
+```
+python tail-estimation.py <path_to_fomatted_degree_sequence> <path_to_output_file>
+```
+
 Suppose we want to compute the tail exponent of a degree distribution of the [CAIDA network](http://konect.uni-koblenz.de/networks/as-caida20071105) provided by [KONECT database](http://konect.uni-koblenz.de/). Tail exponent is usually denoted by <a href="https://www.codecogs.com/eqnedit.php?latex=\boldsymbol{\gamma}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\boldsymbol{\gamma}" title="\boldsymbol{\gamma}" /></a> and shows that degree distribution can be described as <a href="https://www.codecogs.com/eqnedit.php?latex=P(k)&space;=&space;l(k)&space;k^{-\gamma}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?P(k)&space;=&space;l(k)&space;k^{-\gamma}" title="P(k) = l(k) k^{-\gamma}" /></a>. Here <a href="https://www.codecogs.com/eqnedit.php?latex=l(k)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?l(k)" title="l(k)" /></a> is some _slowly-varying function_, see the paper for more details. *** ADD REFERENCE WHEN READY ***
 
 We first convert the network from the format of an edge list to the format of _degree counts_ as indicated above. The converted data can be found under the _Examples_ directory (**CAIDA_KONECT.dat** file). Then we run the _tail-estimation.py_ script as follows:
@@ -35,11 +39,11 @@ python tail-estimation.py ../Examples/CAIDA_KONECT.dat ./CAIDA_plots.pdf
 This will produce a collection of plots saved in the current directory under the "CAIDA_plots.pdf" name as well as some STDOUT messages reporting estimated tail indices. Most users would be interested in just one-number tail index estimates according to three estimators we have implemented so far. They are reported to the STDOUT in the following form (for the CAIDA network example):
 ```
 **********
-Adjusted Hill estimated gamma: 2.09313899261
+Adjusted Hill estimated gamma: 2.08789977759
 **********
-Moments estimated gamma: 2.11325330189
+Moments estimated gamma: 2.11312357734
 **********
-Kernel-type estimated gamma: 2.13032486828
+Kernel-type estimated gamma: 2.13268887452
 **********
 ```
 An example of plots generated for the CAIDA network is given below:
@@ -47,15 +51,17 @@ An example of plots generated for the CAIDA network is given below:
 
 ### What does it mean?!
 
-Although at the first glance the plots produced by the script may seem to be complicated, it is very easy to interpret them for your network! The main thing to notice is that all tail index estimates are plotted in terms of parameter <a href="https://www.codecogs.com/eqnedit.php?latex=$\xi$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\xi$" title="$\xi$" /></a> that is related to the tail index of the PDF of degree distribution <a href="https://www.codecogs.com/eqnedit.php?latex=$\gamma$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\gamma$" title="$\gamma$" /></a> as follows: <a href="https://www.codecogs.com/eqnedit.php?latex=\boldsymbol{\xi}&space;=&space;\boldsymbol{\frac{1}{\gamma&space;-&space;1}}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\boldsymbol{\xi}&space;=&space;\boldsymbol{\frac{1}{\gamma&space;-&space;1}}" title="\boldsymbol{\xi} = \boldsymbol{\frac{1}{\gamma - 1}}" /></a>. We also sometimes use CCDF tail exponent <a href="https://www.codecogs.com/eqnedit.php?latex=\alpha&space;=&space;\gamma&space;-&space;1" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\alpha&space;=&space;\gamma&space;-&space;1" title="\alpha = \gamma - 1" /></a>.
+Although at the first glance the plots produced by the script may seem to be complicated, it is very easy to interpret them for your network! 
+
+The main thing to notice is that all tail index estimates are plotted in terms of parameter <a href="https://www.codecogs.com/eqnedit.php?latex=$\xi$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\xi$" title="$\xi$" /></a> that is related to the tail index of the PDF of degree distribution <a href="https://www.codecogs.com/eqnedit.php?latex=$\gamma$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\gamma$" title="$\gamma$" /></a> as follows: <a href="https://www.codecogs.com/eqnedit.php?latex=\boldsymbol{\xi}&space;=&space;\boldsymbol{\frac{1}{\gamma&space;-&space;1}}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\boldsymbol{\xi}&space;=&space;\boldsymbol{\frac{1}{\gamma&space;-&space;1}}" title="\boldsymbol{\xi} = \boldsymbol{\frac{1}{\gamma - 1}}" /></a>. We also sometimes use CCDF tail exponent <a href="https://www.codecogs.com/eqnedit.php?latex=\alpha&space;=&space;\gamma&space;-&space;1" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\alpha&space;=&space;\gamma&space;-&space;1" title="\alpha = \gamma - 1" /></a>.
 
 Here we list the description of what is exactly shown on each subfigure, starting from the top left one:
 1. Log-binned probability density function (PDF) of a given degree sequence.
-2. Complementary cumulative distribution function (CCDF) of a given degree sequence.
-3. Smooth and adjusted Hill estimates of <a href="https://www.codecogs.com/eqnedit.php?latex=$\xi=&space;1/(\gamma&space;-&space;1)$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\xi=&space;1/(\gamma&space;-&space;1)$" title="$\xi= 1/(\gamma - 1)$" /></a> parameter on a linear scale as a function of the number of included degree sequence order statistic <a href="https://www.codecogs.com/eqnedit.php?latex=$\kappa$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\kappa$" title="$\kappa$" /></a>. Star marker shows best estimate of the tail index <a href="https://www.codecogs.com/eqnedit.php?latex=$\xi$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\xi$" title="$\xi$" /></a> based on the double-bootstrap procedure for Hill estimator.
-4. Smooth and adjusted Hill estimates of <a href="https://www.codecogs.com/eqnedit.php?latex=$\xi$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\xi$" title="$\xi$" /></a> parameter on a semilog scale as a function of the number of included degree sequence order statistic <a href="https://www.codecogs.com/eqnedit.php?latex=$\kappa$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\kappa$" title="$\kappa$" /></a>. Star marker shows best estimate of the tail index <a href="https://www.codecogs.com/eqnedit.php?latex=$\xi$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\xi$" title="$\xi$" /></a> based on the double-bootstrap procedure for Hill estimator.
-5. Pickands, moments and kernel-type estimates of <a href="https://www.codecogs.com/eqnedit.php?latex=$\xi$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\xi$" title="$\xi$" /></a> parameter on a linear scale as a function of the number of included degree sequence order statistic <a href="https://www.codecogs.com/eqnedit.php?latex=$\kappa$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\kappa$" title="$\kappa$" /></a>. Star markers show best estimate of the tail index <a href="https://www.codecogs.com/eqnedit.php?latex=$\xi$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\xi$" title="$\xi$" /></a> based on the double-bootstrap procedure for moments and kernel-type estimators.
-6. Pickands, moments and kernel-type estimates of <a href="https://www.codecogs.com/eqnedit.php?latex=$\xi$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\xi$" title="$\xi$" /></a> parameter on a semilog scale as a function of the number of included degree sequence order statistic <a href="https://www.codecogs.com/eqnedit.php?latex=$\kappa$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\kappa$" title="$\kappa$" /></a>. Star markers show best estimate of the tail index <a href="https://www.codecogs.com/eqnedit.php?latex=$\xi$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\xi$" title="$\xi$" /></a> based on the double-bootstrap procedure for moments and kernel-type estimators.
+2. Complementary cumulative distribution function (CCDF) of a given degree sequence along with _scalings_ based on Hill, moments and kernel-type estimates.
+3. Smooth and adjusted Hill estimates of <a href="https://www.codecogs.com/eqnedit.php?latex=$\xi=&space;1/(\gamma&space;-&space;1)$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\xi=&space;1/(\gamma&space;-&space;1)$" title="$\xi= 1/(\gamma - 1)$" /></a> parameter on a linear scale as a function of the number of included degree sequence order statistic <a href="https://www.codecogs.com/eqnedit.php?latex=$\kappa$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\kappa$" title="$\kappa$" /></a>. Star marker shows best estimate of the tail index <a href="https://www.codecogs.com/eqnedit.php?latex=$\xi$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\xi$" title="$\xi$" /></a> based on the _double-bootstrap procedure_ for Hill estimator.
+4. Smooth and adjusted Hill estimates of <a href="https://www.codecogs.com/eqnedit.php?latex=$\xi$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\xi$" title="$\xi$" /></a> parameter on a semilog scale as a function of the number of included degree sequence order statistic <a href="https://www.codecogs.com/eqnedit.php?latex=$\kappa$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\kappa$" title="$\kappa$" /></a>. Star marker shows best estimate of the tail index <a href="https://www.codecogs.com/eqnedit.php?latex=$\xi$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\xi$" title="$\xi$" /></a> based on the _double-bootstrap procedure_ for Hill estimator.
+5. Pickands, moments and kernel-type estimates of <a href="https://www.codecogs.com/eqnedit.php?latex=$\xi$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\xi$" title="$\xi$" /></a> parameter on a linear scale as a function of the number of included degree sequence order statistic <a href="https://www.codecogs.com/eqnedit.php?latex=$\kappa$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\kappa$" title="$\kappa$" /></a>. Star markers show best estimate of the tail index <a href="https://www.codecogs.com/eqnedit.php?latex=$\xi$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\xi$" title="$\xi$" /></a> based on the _double-bootstrap procedure_ for moments and kernel-type estimators.
+6. Pickands, moments and kernel-type estimates of <a href="https://www.codecogs.com/eqnedit.php?latex=$\xi$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\xi$" title="$\xi$" /></a> parameter on a semilog scale as a function of the number of included degree sequence order statistic <a href="https://www.codecogs.com/eqnedit.php?latex=$\kappa$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\kappa$" title="$\kappa$" /></a>. Star markers show best estimate of the tail index <a href="https://www.codecogs.com/eqnedit.php?latex=$\xi$" target="_blank"><img src="https://latex.codecogs.com/gif.latex?$\xi$" title="$\xi$" /></a> based on the _double-bootstrap procedure_ for moments and kernel-type estimators.
 
 ## Advanced Examples
 
@@ -66,11 +72,11 @@ In the simplest example above, three tail index estimators (Hill, moments and ke
 Let us consider an example of in-degree sequence generated from [Libimseti](http://konect.uni-koblenz.de/networks/libimseti) dating website network that is also available under the _Examples_ directory (**Libimseti_in_KONECT.dat** file). Running the script on this sequence produces the following estimates for the distribution exponent:
 ```
 **********
-Adjusted Hill estimated gamma: 6.66934111471
+Adjusted Hill estimated gamma: 6.66857184371
 **********
-Moments estimated gamma: 2.5679691337
+Moments estimated gamma: 2.56602379127
 **********
-Kernel-type estimated gamma: 2.6705411871
+Kernel-type estimated gamma: 2.67061450223
 **********
 ```
 
@@ -106,7 +112,7 @@ Fortunately, [it can be shown](https://repository.tudelft.nl/islandora/object/uu
 It is fairly easy to use our code with non-network data, i.e., non-integer-valued data sequences. Simply convert your data to the required input format and switch off the noise by using `--noise 0` flag. We demonstrate this by generating a sequence of Pareto-distributed values with tail exponent <a href="https://www.codecogs.com/eqnedit.php?latex=\gamma&space;=&space;2.5" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\gamma&space;=&space;2.5" title="\gamma = 2.5" /></a>. The data sequence converted to the format used by the script can be found under the _Examples_ directory (**Pareto.dat** file). Estimated tail exponents are very close to the true value:
 ```
 **********
-Adjusted Hill estimated gamma: 2.53721760598
+Adjusted Hill estimated gamma: 2.53892001213
 **********
 Moments estimated gamma: 2.55227073369
 **********

@@ -66,7 +66,7 @@ def get_distribution(data_sequence, number_of_bins = 30):
     y = [k for i,k in enumerate(y) if i not in drop_indices]
     return x, y
 
-def get_ccdf(degree_sequence, discrete = True):
+def get_ccdf(degree_sequence):
     """
     Function to get CCDF of the list of degrees.
     
@@ -1103,6 +1103,7 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
 
     # add noise if needed
     if noise_flag:
+        discrete_ordered_data = ordered_data
         ordered_data = add_uniform_noise(ordered_data, p = p_noise)
     ordered_data[::-1].sort()
     
@@ -1237,42 +1238,57 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
     axes[0,1].set_yscale("log")
     axes[0,1].step(x_ccdf, y_ccdf, color = "#386cb0", lw = 1.5)
     
-
-    # Commented out for now
-    '''
-    hill_pl_plot = x_ccdf[np.where(y_ccdf <= k_h_star/float(len(ordered_data)))]
-    initial_y = y_ccdf[(np.abs(y_ccdf - k_h_star/float(len(ordered_data)))).argmin()]
-    initial_x = x_ccdf[(np.abs(y_ccdf - k_h_star/float(len(ordered_data)))).argmin()]
-    A = initial_y * initial_x**(1./xi_h_star)
-    if xi_h_star > 0.15:
-        axes[0,1].plot(hill_pl_plot,
-                       [A*(k)**(-1./xi_h_star) for k in hill_pl_plot], 
-                       ls = "--", color = '#fb8072', alpha = 0.8,
+    # draw scalings
+    if noise_flag:
+        xmin = discrete_ordered_data[k_h_star]
+    else:
+        xmin = ordered_data[k_h_star]
+    x = x_ccdf[np.where(x_ccdf >= xmin)]
+    l = np.mean(y_ccdf[np.where(x == xmin)])
+    alpha = 1./xi_h_star
+    if xi_h_star > 0:
+        axes[0,1].plot(x, [l*(float(xmin)/k)**alpha for k in x],
+                       color = '#fb8072', ls = '--', lw = 2,
                        label = r"Adj. Hill Scaling $(\alpha="+\
                        str(np.round(1./xi_h_star, decimals = 3))+r")$")
-    
-    mom_pl_plot = x_ccdf[np.where(y_ccdf <= k_m_star/float(len(ordered_data)))]
-    initial_y = y_ccdf[(np.abs(y_ccdf - k_m_star/float(len(ordered_data)))).argmin()]
-    initial_x = x_ccdf[(np.abs(y_ccdf - k_m_star/float(len(ordered_data)))).argmin()]
-    A = initial_y * initial_x**(1./xi_m_star)
-    if xi_m_star > 0.15:
-        axes[0,1].plot(mom_pl_plot,
-                       [A*(k)**(-1./xi_m_star) for k in mom_pl_plot], 
-                       ls = "--", color = '#8dd3c7', alpha = 0.8,
+        axes[0,1].plot((x[-1]), [l*(float(xmin)/x[-1])**(alpha)],
+                                   color = "#fb8072", ls = 'none', marker = 'o',
+                                   markerfacecolor = 'none', markeredgecolor = "#fb8072",
+                                   markeredgewidth = 3, markersize = 10)
+    if noise_flag:
+        xmin = discrete_ordered_data[k_m_star]
+    else:
+        xmin = ordered_data[k_m_star]
+    x = x_ccdf[np.where(x_ccdf >= xmin)]
+    l = np.mean(y_ccdf[np.where(x == xmin)])
+    alpha = 1./xi_m_star
+    if xi_m_star > 0:
+        axes[0,1].plot(x, [l*(float(xmin)/k)**alpha for k in x],
+                       color = '#8dd3c7', ls = '--', lw = 2,
                        label = r"Moments Scaling $(\alpha="+\
                        str(np.round(1./xi_m_star, decimals = 3))+r")$")
-    ker_pl_plot = x_ccdf[np.where(y_ccdf <= k_k_star/float(len(ordered_data)))]
-    initial_y = y_ccdf[(np.abs(y_ccdf - k_k_star/float(len(ordered_data)))).argmin()]
-    initial_x = x_ccdf[(np.abs(y_ccdf - k_k_star/float(len(ordered_data)))).argmin()]
-    A = initial_y * initial_x**(1./xi_k_star)
-    if xi_k_star > 0.15:
-        axes[0,1].plot(ker_pl_plot,
-                       [A*(k)**(-1./xi_k_star) for k in ker_pl_plot], 
-                       ls = "--", color = '#fdb462', alpha = 0.8,
+        axes[0,1].plot((x[-1]), [l*(float(xmin)/x[-1])**(alpha)],
+                                   color = "#8dd3c7", ls = 'none', marker = 'o',
+                                   markerfacecolor = 'none', markeredgecolor = "#8dd3c7",
+                                   markeredgewidth = 3, markersize = 10)
+    if noise_flag:
+        xmin = discrete_ordered_data[k_k_star]
+    else:
+        xmin = ordered_data[k_k_star]
+    x = x_ccdf[np.where(x_ccdf >= xmin)]
+    l = np.mean(y_ccdf[np.where(x == xmin)])
+    alpha = 1./xi_k_star
+    if xi_k_star > 0:
+        axes[0,1].plot(x, [l*(float(xmin)/k)**alpha for k in x],
+                       color = '#fdb462', ls = '--', lw = 2,
                        label = r"Kernel Scaling $(\alpha="+\
-                       str(np.round(1./xi_k_star, decimals = 3))+r")$")
-    axes[0,1].legend(loc = "best")
-    '''
+                       str(np.round(1./xi_m_star, decimals = 3))+r")$")
+        axes[0,1].plot((x[-1]), [l*(float(xmin)/x[-1])**(alpha)],
+                                   color = "#8dd3c7", ls = 'none', marker = 'o',
+                                   markerfacecolor = 'none', markeredgecolor = "#fdb462",
+                                   markeredgewidth = 3, markersize = 10)
+    axes[0,1].legend(loc = 'best')
+    
 
 
     # define min and max order statistics to plot
