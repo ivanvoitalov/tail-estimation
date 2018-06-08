@@ -4,6 +4,8 @@
 
 This script is intended to be a single-file simple solution to the complex networks degree sequence _tail index estimation_. It consists of several well-established estimators combined into one toolbox along with some useful plotting routines that usually help to analyze a given degree distribution.
 
+If you use this script as a part of your research, we would be grateful if you cite this code repository and/or the original paper (*link to the paper to be added soon*).
+
 ## Dependencies
 
 The script requires the following packages to be installed in addition to the standard libraries shipped with Python:
@@ -29,7 +31,7 @@ Here we provide the simplest usage example of the _tail-estimation_ script:
 python tail-estimation.py <path_to_fomatted_degree_sequence> <path_to_output_file>
 ```
 
-Suppose we want to compute the tail exponent of a degree distribution of the [CAIDA network](http://konect.uni-koblenz.de/networks/as-caida20071105) provided by [KONECT database](http://konect.uni-koblenz.de/). Tail exponent is usually denoted by <a href="https://www.codecogs.com/eqnedit.php?latex=\boldsymbol{\gamma}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\boldsymbol{\gamma}" title="\boldsymbol{\gamma}" /></a> and shows that degree distribution can be described as <a href="https://www.codecogs.com/eqnedit.php?latex=P(k)&space;=&space;l(k)&space;k^{-\gamma}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?P(k)&space;=&space;l(k)&space;k^{-\gamma}" title="P(k) = l(k) k^{-\gamma}" /></a>. Here <a href="https://www.codecogs.com/eqnedit.php?latex=l(k)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?l(k)" title="l(k)" /></a> is some _slowly-varying function_, see the paper for more details. *** ADD REFERENCE WHEN READY ***
+Suppose we want to compute the tail exponent of a degree distribution of the [CAIDA network](http://konect.uni-koblenz.de/networks/as-caida20071105) provided by [KONECT database](http://konect.uni-koblenz.de/). Tail exponent is usually denoted by <a href="https://www.codecogs.com/eqnedit.php?latex=\boldsymbol{\gamma}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\boldsymbol{\gamma}" title="\boldsymbol{\gamma}" /></a> and shows that degree distribution can be described as <a href="https://www.codecogs.com/eqnedit.php?latex=P(k)&space;=&space;l(k)&space;k^{-\gamma}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?P(k)&space;=&space;l(k)&space;k^{-\gamma}" title="P(k) = l(k) k^{-\gamma}" /></a>. Here <a href="https://www.codecogs.com/eqnedit.php?latex=l(k)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?l(k)" title="l(k)" /></a> is some _slowly-varying function_, see the paper for more details (*reference to be added soon*).
 
 We first convert the network from the format of an edge list to the format of _degree counts_ as indicated above. The converted data can be found under the _Examples_ directory (**CAIDA_KONECT.dat** file). Then we run the _tail-estimation.py_ script as follows:
 ```
