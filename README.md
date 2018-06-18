@@ -22,7 +22,7 @@ The script processes a degree sequence in the form of:
 ```
 k n(k)
 ```
-where **k** is a node's degree and **n(k)** is the number of nodes with such degree in the network. Note that these two numbers are whitespace-separated.
+where **k** is a node's degree and **n(k)** is the number of nodes with such degree in the network. Note that these two numbers are whitespace-separated. User can also provide one of the four supported delimiters using `--delimiter` flag, see Command Line Options section for more details.
 
 ## Simple Usage Example
 
@@ -210,4 +210,7 @@ optional arguments:
 
   --savedata            Flag to save data files in the directory with plots.
                         (default = 0)
+
+  --delimiter           Delimiter used in the input file. Options are:
+                        whitespace, tab, comma, semicolon.
 ```

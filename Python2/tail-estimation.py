@@ -1689,6 +1689,10 @@ def main():
                         with plots.\
                         (default = 0)",
                         type = int, default = 0)
+    parser.add_argument("--delimiter",
+                        help = "Delimiter used in the input file.\
+                        Options are: whitespace, tab, comma, semicolon.",
+                        type = str, default = "whitespace")
     args = parser.parse_args()
 
     # check arguments for consistency
@@ -1724,6 +1728,8 @@ def main():
         parser.error("Theta parameters should be in [0,1] range, where theta1 < theta2.")
     if args.theta2 <= args.theta1:
         parser.error("Theta parameters should be in [0,1] range, where theta1 < theta2.")
+    if args.delimiter not in set(['whitespace', 'tab', 'comma', 'semicolon']):
+        parser.error("Delimiter provided is not supported.")
 
     number_of_bins = args.nbins
     r_smooth = args.rsmooth
@@ -1751,22 +1757,32 @@ def main():
     else:
         verbose = False
 
+    if args.delimiter == "whitespace":
+        delimiter = " "
+    elif args.delimiter == "tab":
+        delimiter = "\t"
+    elif args.delimiter == "comma":
+        delimiter = ","
+    elif args.delimiter == "semicolon":
+        delimiter = ";"
+
     # check for number of entries
     N = 0
     with open(args.sequence_file_path, "r") as f:
         for line in f:
-            degree, count = line.strip().split()
+            degree, count = line.strip().split(delimiter)
             N += int(count)
     print "Number of data entries: %i" % N
     ordered_data = np.zeros(N)
     current_index = 0      
     with open(args.sequence_file_path, "r") as f:
         for line in f:
-            degree, count = line.strip().split()
+            degree, count = line.strip().split(delimiter)
             ordered_data[current_index:current_index + int(count)] = float(degree)
             current_index += int(count)
     #enforce minimization boundary to the left of min(k) points
-    border_value = int(np.ceil(np.percentile(ordered_data, 30)))
+    #set to 10th percentile by default
+    border_value = int(np.ceil(np.percentile(ordered_data, 10)))
     eps_stop2 = 1 - float(len(ordered_data[np.where(ordered_data <= border_value)]))\
                    /len(ordered_data)
     print "Recommended double-bootstrap epsstop "+\
