@@ -41,11 +41,11 @@ python tail-estimation.py ../Examples/CAIDA_KONECT.dat ./CAIDA_plots.pdf
 This will produce a collection of plots saved in the current directory under the "CAIDA_plots.pdf" name as well as some STDOUT messages reporting estimated tail indices. Most users would be interested in just one-number tail index estimates according to three estimators we have implemented so far. They are reported to the STDOUT in the following form (for the CAIDA network example):
 ```
 **********
-Adjusted Hill estimated gamma: 2.08789977759
+Adjusted Hill estimated gamma: 2.1226806423
 **********
-Moments estimated gamma: 2.11312357734
+Moments estimated gamma: 2.13497590133
 **********
-Kernel-type estimated gamma: 2.13268887452
+Kernel-type estimated gamma: 2.14746542689
 **********
 ```
 An example of plots generated for the CAIDA network is given below:
@@ -74,11 +74,11 @@ In the simplest example above, three tail index estimators (Hill, moments and ke
 Let us consider an example of in-degree sequence generated from [Libimseti](http://konect.uni-koblenz.de/networks/libimseti) dating website network that is also available under the _Examples_ directory (**Libimseti_in_KONECT.dat** file). Running the script on this sequence produces the following estimates for the distribution exponent:
 ```
 **********
-Adjusted Hill estimated gamma: 6.66857184371
+Adjusted Hill estimated gamma: 4.35048745688
 **********
-Moments estimated gamma: 2.56602379127
+Moments estimated gamma: 2.56745258636
 **********
-Kernel-type estimated gamma: 2.67061450223
+Kernel-type estimated gamma: 2.6652695028
 **********
 ```
 
@@ -95,30 +95,25 @@ This will produce an additional figure that in our case looks like this:
 
 Two subplots show average AMSE plots versus fraction of order statistics used for estimation for three estimators: Hill, moments and kernel-type. Blue and orange lines indicate AMSE lines for the 1st (larger size) and 2nd (smaller size) bootstrap samples; round markers indicate minima for the 1st and 2nd bootstrap samples. Dashed lines indicate boundary after which minimization is not performed. This is done to alleviate problems with artificially added uniform noise that we will describe in details in the next subsection. 
 
-As can be seen from the figure, Hill estimator's AMSE plot has minimum somewhere very close to first order statistics which indicates that Hill estimator estimates tail index very close to the actual tail of the empirical distribution. This can be clearly seen if we plot in-degree CCDF of the _Libimseti_ network along with "power-law scalings" given by the three estimators:
-![Libimseti Diagnostic](https://raw.githubusercontent.com/ivanvoitalov/tail-estimation/master/Figures/Libimseti_CCDF.png)
-
-Scalings shown by the dashed lines here begin from the points where double-bootstrap algorithms suggest to start tail index estimation. Clearly, Hill estimator's double-bootstrap suggests to fit only the small fraction of degrees that represent the far tail of the distribution, just as diagnostic plots indicated. 
+As can be seen from the figure, Hill estimator's AMSE plot has minimum somewhere very close to first order statistics which indicates that Hill estimator estimates tail index very close to the actual tail of the empirical distribution. This can be clearly seen on the CCDF plot of the _Libimseti_ in-degree sequence shown on the top right panel of the output figure. Scalings shown by the dashed lines begin from the points where double-bootstrap algorithms "suggest" to start tail index estimation. Clearly, Hill estimator's double-bootstrap suggests to fit only the small fraction of degrees that represent the far tail of the distribution, just as diagnostic plots indicated. 
 
 ### Noise and why is it added
 
-As we mentioned previously, we restrict AMSE minimization procedure to certain region that neglects low-degree entries in a given degree sequence. This is done to prevent double-bootstrap procedure from being "tricked" into false AMSE minima due to the uniform noise <a href="https://www.codecogs.com/eqnedit.php?latex=u&space;\in&space;[-0.5,0.5]" target="_blank"><img src="https://latex.codecogs.com/gif.latex?u&space;\in&space;[-0.5,0.5]" title="u \in [-0.5,0.5]" /></a> that we artificially add to each data entry. Why is this noise added?
-
-It is known that all considered estimators are consistent, however, all consistency proofs are obtained only in certain asymptotic regime, moreover, for float-valued sequences. Working with network degree sequences, of course, makes all considered data sequences integer-valued which may possibly worsen estimators' performance. For example, if we consider the same CAIDA network but do not add uniform small noise to each data entry, the resulting plots will look much less converging:
+It is known that all estimators used in the package are consistent, however, all consistency proofs are obtained only in certain asymptotic regime, moreover, for real-valued sequences. Working with network degree sequences, of course, makes all considered data sequences integer-valued which may possibly worsen estimators' performance. For example, if we consider the same CAIDA network but do not add uniform small noise to each data entry, the resulting plots will look much less converging:
 ![CAIDA Integer](https://raw.githubusercontent.com/ivanvoitalov/tail-estimation/master/Figures/CAIDA_output_integer.png)
 
-Fortunately, [it can be shown](https://repository.tudelft.nl/islandora/object/uuid:a5f3cee6-619f-4d3e-a461-f5ff1bed5f37/datastream/OBJ) that adding small uniform noise does not affect tail indices of integer-valued distributions, therefore, we apply the same technique in our code. Hence, to prevent double-bootstrap from minimizing in the region of degrees where noise is highly pronounced (i.e., low degrees), we enforce artificial minimization boundary set to the fraction of order statistics corresponding to at least 10-th percentile of the data empirical distribution. However, it is possible to control this value manually by using `--epsstop` flag. 
+Fortunately, it can be shown[2](https://repository.tudelft.nl/islandora/object/uuid:a5f3cee6-619f-4d3e-a461-f5ff1bed5f37/datastream/OBJ) that adding small uniform noise does not affect tail indices of integer-valued distributions, therefore, we apply the same technique in our code. Hence, to prevent double-bootstrap from minimizing in the region of degrees where noise is highly pronounced (i.e., low degrees), we enforce artificial minimization boundary set to the entries less or equal to one. However, it is possible to control this value manually by using `--amseborder` flag. 
 
 ### Analyzing non-network data
 
 It is fairly easy to use our code with non-network data, i.e., non-integer-valued data sequences. Simply convert your data to the required input format and switch off the noise by using `--noise 0` flag. We demonstrate this by generating a sequence of Pareto-distributed values with tail exponent <a href="https://www.codecogs.com/eqnedit.php?latex=\gamma&space;=&space;2.5" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\gamma&space;=&space;2.5" title="\gamma = 2.5" /></a>. The data sequence converted to the format used by the script can be found under the _Examples_ directory (**Pareto.dat** file). Estimated tail exponents are very close to the true value:
 ```
 **********
-Adjusted Hill estimated gamma: 2.53892001213
+Adjusted Hill estimated gamma: 2.49970070563
 **********
-Moments estimated gamma: 2.55227073369
+Moments estimated gamma: 2.53510190253
 **********
-Kernel-type estimated gamma: 2.55758891601
+Kernel-type estimated gamma: 2.57508453341
 **********
 ```
 The output plots look as follows for this dataset:
@@ -135,9 +130,9 @@ Currently, several estimator are implemented:
 ## Double-bootstrap for Optimal Threshold Estimation
 
 The package implements double-bootstrap estimation of the optimal order statistic for Hill, moments and kernel-type estimators. Details on the double-bootstrap algorithms for these estimators can be found in the following papers:
-* Hill double-boostrap: [Danielsson et al. (2001)](https://www.riskresearch.org/papers/DanielssonHaanPengVries2001/)
-* Moments double-bootstrap: [Draisma et al. (1999)](https://link.springer.com/article/10.1023/A:1009900215680)
-* Kernel-type double-bootstrap: [Groeneboom et al. (2003)](https://www.jstor.org/stable/3448443)
+* Hill double-bootstrap: [Danielsson et al. (2001)](https://www.riskresearch.org/papers/DanielssonHaanPengVries2001/) and [Y. Qi (2008)](https://link.springer.com/article/10.1007/s10687-007-0049-8);
+* moments double-bootstrap: [Draisma et al. (1999)](https://link.springer.com/article/10.1023/A:1009900215680);
+* kernel-type double-bootstrap: [Groeneboom et al. (2003)](https://www.jstor.org/stable/3448443).
 
 ## Command Line Options
 
@@ -163,34 +158,31 @@ optional arguments:
   --hsteps              Parameter to select number of bandwidth steps for
                         kernel-type estimator, (default = 200).
 
-  --noise               Switch on/off uniform noise in range [-5*10^(-p),
-                        5*10^(-p)] that is added to each data point. Used for
-                        integer-valued sequences with p = 1 (default = 1).
+  --noise               Switch on/off uniform noise in range [0, 10^p] that is
+                        added to each data point. Used for integer-valued
+                        sequences with p = 0 (default = 1).
 
   --pnoise              Uniform noise parameter corresponding to the rounding
                         error of the data sequence. For integer values it
-                        equals to 1. (default = 1).
+                        equals to 0. (default = 0).
 
   --bootstrap           Flag to switch on/off double-bootstrap algorithm for
                         defining optimal order statistic of Hill, moments and
                         kernel-type estimators. (default = 1)
 
   --tbootstrap          Fraction of bootstrap samples in the 2nd bootstrap
-                        defined as n^tbootstrap, i.e., for n^0.5 a sqrt(n) is
-                        the size of a single bootstrap sample (default = 0.5).
+                        defined as n*tbootstrap, i.e., for n*0.5 a n/2 is the
+                        size of a single bootstrap sample (default = 0.5).
 
   --rbootstrap          Number of bootstrap resamplings used in double-
                         bootstrap. Note that each sample results are stored in
                         an array, so be careful about the memory (default =
                         500).
 
-  --epsstop             Upper bound for order statistic to consider for
-                        double-bootstrap AMSE minimizer defined as max_k =
-                        epsstop*n, so that for epsstop = 0.5 only first half
-                        order statistics of the bootstrap samples will be
-                        considered in AMSE minimization procedure. Use it with
-                        diagnostic AMSE plots if estimators' results don't
-                        agree with each other (default = 0.9).
+  --amseborder          Upper bound for order statistic to consider for
+                        double-bootstrap AMSE minimizer. Entries that are
+                        smaller or equal to the border value are ignored
+                        during AMSE minimization (default = 1).
 
   --theta1              Lower bound of plotting range, defined as k_min =
                         ceil(n^theta1), (default = 0.01). Overwritten if plots

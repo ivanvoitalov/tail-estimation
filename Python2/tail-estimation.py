@@ -6,16 +6,14 @@ import warnings
 import numpy as np
 from matplotlib import pyplot as plt
 
-
-
 # =========================================
 # ========== Auxiliary Functions ==========
 # =========================================
 
-def add_uniform_noise(data_sequence, p = 1):
+def add_uniform_noise(data_sequence, p = 0):
     """
     Function to add uniform random noise to a given dataset.
-    Uniform noise in range [-5*10^(-p), 5*10^p] is added to each
+    Uniform noise in range [0, 10^p] is added to each
     data entry.
 
     Args:
@@ -25,10 +23,10 @@ def add_uniform_noise(data_sequence, p = 1):
     Returns:
         numpy array with noise-added entries.
     """
-    if p < 1:
-        print "Parameter p should be greater or equal to 1."
+    if p < 0:
+        print "Parameter p should be greater or equal to 0."
         return None
-    noise = np.random.uniform(-5.*10**(-p), 5*10**(-p), size = len(data_sequence))
+    noise = np.random.uniform(0, 10.**p, size = len(data_sequence))
     randomized_data_sequence = data_sequence + noise
     return randomized_data_sequence
 
@@ -75,23 +73,13 @@ def get_ccdf(degree_sequence):
 
     Returns:
         uniques: unique degree values met in the sequence.
-        CCDF: CCDF values corresponding to the unique values
-              from the 'uniques' array.
+        1-CDF: CCDF values corresponding to the unique values
+               from the 'uniques' array.
     """
-    N = len(degree_sequence)
-    p = 1. * np.arange(N) / (N)
-    sorted_data = degree_sequence
-    sorted_data[::-1].sort()
-    #if data is discrete, trim non-important repeating values
-    indices = []
-    for i in xrange(1, N):
-        if sorted_data[i] != sorted_data[i-1]:
-            indices.append(i-1)
-    #take care of the last value
-    indices.append(N-1)
-    uniques = degree_sequence[indices]
-    return uniques, p[indices]
-
+    uniques, counts = np.unique(degree_sequence, return_counts=True)
+    cumprob = np.cumsum(counts).astype(np.double) / (degree_sequence.size)
+    return uniques[::-1], (1. - cumprob)[::-1]
+    
 # ================================================
 # ========== Hill Tail Index Estimation ==========
 # ================================================
@@ -195,7 +183,7 @@ def hill_dbs(ordered_data, t_bootstrap = 0.5,
             ordered_data: numpy array for which double-bootstrap
                           is performed. Decreasing ordering is required.
             t_bootstrap:  parameter controlling the size of the 2nd
-                          bootstrap. Defined from n2 = n^(t_bootstrap).
+                          bootstrap. Defined from n2 = n*(t_bootstrap).
             r_bootstrap:  number of bootstrap resamplings for the 1st and 2nd
                           bootstraps.
             eps_stop:     parameter controlling range of AMSE minimization.
@@ -280,9 +268,17 @@ def hill_dbs(ordered_data, t_bootstrap = 0.5,
             min_index1 = min_index1 + int(0.005*n)
             min_index2 = min_index2 + int(0.005*n)
             k2 = None
-        
+    
+    '''
+    # this constant is provided in the Danielsson's paper
+    # use instead of rho below if needed
     rho = (np.log(k1)/(2.*np.log(n1) - np.log(k1)))\
           **(2.*(np.log(n1) - np.log(k1))/(np.log(n1)))
+    '''
+    
+    # this constant is provided in Qi's paper
+    rho = (2.*(np.log(n1)/np.log(k1) - 1.))**(np.log(k1)/np.log(n1) - 1.)
+    
     k_star = (k1*k1/float(k2)) * rho
     k_star = int(np.round(k_star))
     if int(k_star) >= len(ordered_data):
@@ -316,7 +312,7 @@ def hill_estimator(ordered_data,
                       is performed. Decreasing ordering is required.
         bootstrap:    flag to switch on/off double-bootstrap procedure.
         t_bootstrap:  parameter controlling the size of the 2nd
-                      bootstrap. Defined from n2 = n^(t_bootstrap).
+                      bootstrap. Defined from n2 = n*(t_bootstrap).
         r_bootstrap:  number of bootstrap resamplings for the 1st and 2nd
                       bootstraps.
         eps_stop:     parameter controlling range of AMSE minimization.
@@ -491,7 +487,7 @@ def moments_dbs(ordered_data, xi_n, t_bootstrap = 0.5,
         xi_n:         moments tail index estimate corresponding to
                       sqrt(n)-th order statistic.
         t_bootstrap:  parameter controlling the size of the 2nd
-                      bootstrap. Defined from n2 = n^(t_bootstrap).
+                      bootstrap. Defined from n2 = n*(t_bootstrap).
         r_bootstrap:  number of bootstrap resamplings for the 1st and 2nd
                       bootstraps.
         eps_stop:     parameter controlling range of AMSE minimization.
@@ -607,7 +603,7 @@ def moments_estimator(ordered_data,
                       is performed. Decreasing ordering is required.
         bootstrap:    flag to switch on/off double-bootstrap procedure.
         t_bootstrap:  parameter controlling the size of the 2nd
-                      bootstrap. Defined from n2 = n^(t_bootstrap).
+                      bootstrap. Defined from n2 = n*(t_bootstrap).
         r_bootstrap:  number of bootstrap resamplings for the 1st and 2nd
                       bootstraps.
         eps_stop:     parameter controlling range of AMSE minimization.
@@ -798,7 +794,7 @@ def kernel_type_dbs(ordered_data, hsteps, t_bootstrap = 0.5,
         hsteps:       parameter controlling number of bandwidth steps
                       of the kernel-type estimator.
         t_bootstrap:  parameter controlling the size of the 2nd
-                      bootstrap. Defined from n2 = n^(t_bootstrap).
+                      bootstrap. Defined from n2 = n*(t_bootstrap).
         r_bootstrap:  number of bootstrap resamplings for the 1st and 2nd
                       bootstraps.
         alpha:        parameter controlling the amount of "smoothing"
@@ -932,7 +928,7 @@ def kernel_type_estimator(ordered_data, hsteps, alpha = 0.6,
                       than 0.5.
         bootstrap:    flag to switch on/off double-bootstrap procedure.
         t_bootstrap:  parameter controlling the size of the 2nd
-                      bootstrap. Defined from n2 = n^(t_bootstrap).
+                      bootstrap. Defined from n2 = n*(t_bootstrap).
         r_bootstrap:  number of bootstrap resamplings for the 1st and 2nd
                       bootstraps.
         eps_stop:     parameter controlling range of AMSE minimization.
@@ -1050,7 +1046,7 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
                           of the kernel-type estimator.
         bootstrap_flag:   flag to switch on/off double-bootstrap procedure.
         t_bootstrap:      parameter controlling the size of the 2nd
-                          bootstrap. Defined from n2 = n^(t_bootstrap).
+                          bootstrap. Defined from n2 = n*(t_bootstrap).
         r_bootstrap:      number of bootstrap resamplings for the 1st and 2nd
                           bootstraps.
         diagn_plots:      flag to switch on/off generation of AMSE diagnostic
@@ -1103,7 +1099,9 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
 
     # add noise if needed
     if noise_flag:
+        original_discrete_data = ordered_data
         discrete_ordered_data = ordered_data
+        discrete_ordered_data[::-1].sort()
         ordered_data = add_uniform_noise(ordered_data, p = p_noise)
     ordered_data[::-1].sort()
     
@@ -1210,6 +1208,7 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
     xi_k_star = kernel_type_results[3]
     x1_k_arr, n1_k_amse, h1, max_k_index1 = kernel_type_results[4:8]
     x2_k_arr, n2_k_amse, h2, max_k_index2 = kernel_type_results[8:]
+
     if bootstrap_flag:
         k_k1_star = np.argmin(np.abs(k_k_arr - k_k_star))
     if savedata == 1:
@@ -1282,14 +1281,12 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
         axes[0,1].plot(x, [l*(float(xmin)/k)**alpha for k in x],
                        color = '#fdb462', ls = '--', lw = 2,
                        label = r"Kernel Scaling $(\alpha="+\
-                       str(np.round(1./xi_m_star, decimals = 3))+r")$")
+                       str(np.round(1./xi_k_star, decimals = 3))+r")$")
         axes[0,1].plot((x[-1]), [l*(float(xmin)/x[-1])**(alpha)],
                                    color = "#8dd3c7", ls = 'none', marker = 'o',
                                    markerfacecolor = 'none', markeredgecolor = "#fdb462",
                                    markeredgewidth = 3, markersize = 10)
     axes[0,1].legend(loc = 'best')
-    
-
 
     # define min and max order statistics to plot
     min_k = int(np.ceil(len(k_h_arr)**theta1)) - 1
@@ -1329,7 +1326,6 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
                        label = r"$\widehat{\xi}^{Hill}="\
                            +str(np.round([xi_h_arr[k_h_star-1]][0], decimals = 3))\
                            +r"$")
-    axes[1,0].legend(loc = "best")
 
     
     axes[1,1].set_xlabel(r"Number of Order Statistics $\kappa$", fontsize = 15)
@@ -1356,7 +1352,6 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
 
     axes[2,0].set_xlabel(r"Number of Order Statistics $\kappa$", fontsize = 15)
     axes[2,0].set_ylabel(r"Estimated $\hat{\xi}$", fontsize = 15)
-
     #plot Pickands
     min_k_index = (np.abs(k_p_arr - min_k)).argmin()
     max_k_index = (np.abs(k_p_arr - max_k)).argmin()
@@ -1450,6 +1445,9 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
         min_k2 = 2
         max_k2 = len(x2_h_arr) - 1
         axes_d[0].set_yscale("log")
+        axes_d[0].set_xscale("log")
+        axes_d[1].set_xscale("log")
+        axes_d[2].set_xscale("log")
         n1_h_amse[np.where((n1_h_amse == np.inf) |\
                            (n1_h_amse == -np.inf))] = np.nan
         axes_d[0].set_ylim((0.1*np.nanmin(n1_h_amse[min_k1:max_k1]), 1.0))
@@ -1478,6 +1476,8 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
         axes_d[0].axvline(max_h_index2/float(len(x2_h_arr)), color = "#0072b2",
                           ls = '--', alpha = 0.5,
                           label = r"Minimization boundary for $n_2$ sample")
+        
+
         axes_d[0].legend(loc = "best")
         if savedata == 1:
             with open(os.path.join(output_dir+"/"+output_name+"_adjhill_diagn1.dat"), "w") as f:
@@ -1627,15 +1627,15 @@ def main():
                         type = int, default = 200)
     parser.add_argument("--noise",
                         help = "Switch on/off uniform noise in range\
-                        [-5*10^(-p), 5*10^(-p)] that is added to each\
+                        [0, 10^p] that is added to each\
                         data point. Used for integer-valued sequences\
-                        with p = 1 (default = 1).",
+                        with p = 0 (default = 1).",
                         type = int, default = 1)
     parser.add_argument("--pnoise",
                         help = "Uniform noise parameter corresponding to\
                         the rounding error of the data sequence. For integer\
-                        values it equals to 1. (default = 1).",
-                        type = int, default = 1)
+                        values it equals to 0. (default = 0).",
+                        type = int, default = 0)
     parser.add_argument("--bootstrap",
                         help = "Flag to switch on/off double-bootstrap\
                         algorithm for defining optimal order statistic\
@@ -1644,8 +1644,8 @@ def main():
                         type = int, default = 1)
     parser.add_argument("--tbootstrap",
                         help = "Fraction of bootstrap samples in the 2nd\
-                        bootstrap defined as n^tbootstrap, i.e., for\
-                        n^0.5 a sqrt(n) is the size of a single bootstrap\
+                        bootstrap defined as n*tbootstrap, i.e., for\
+                        n*0.5 a n/2 is the size of a single bootstrap\
                         sample (default = 0.5).",
                         type = float, default = 0.5)
     parser.add_argument("--rbootstrap",
@@ -1654,15 +1654,12 @@ def main():
                         are stored in an array, so be careful about the\
                         memory (default = 500).",
                         type = int, default = 500)
-    parser.add_argument("--epsstop",
+    parser.add_argument("--amseborder",
                         help = "Upper bound for order statistic to consider\
-                        for double-bootstrap AMSE minimizer defined as\
-                        max_k = epsstop*n, so that for epsstop = 0.5 only\
-                        first half order statistics of the bootstrap samples\
-                        will be considered in AMSE minimization procedure.\
-                        Use it with diagnostic AMSE plots if estimators' results\
-                        don't agree with each other (default = 0.9).",
-                        type = float, default = 0.9)
+                        for double-bootstrap AMSE minimizer.\
+                        Entries that are smaller or equal to the border value\
+                        are ignored during AMSE minimization (default = 1).",
+                        type = float, default = 1.0)
     parser.add_argument("--theta1",
                         help = "Lower bound of plotting range, defined as\
                         k_min = ceil(n^theta1), (default = 0.01).\
@@ -1677,7 +1674,7 @@ def main():
                         help = "Flag to switch on/off plotting AMSE statistics\
                         for Hill/moments/kernel-type double-bootstrap algorithm.\
                         Used for diagnostics when double-bootstrap provides unstable\
-                        results. Can be used to find proper epsstop parameter.\
+                        results. Can be used to find proper amseborder parameter.\
                         (default = 0).",
                         type = int, default = 0)
     parser.add_argument("--verbose",
@@ -1706,16 +1703,16 @@ def main():
         parser.error("hsteps should be greater than 0.")
     if args.noise != 0 and args.noise != 1:
         parser.error("noise flag should be 0 or 1.")
-    if args.pnoise < 1:
-        parser.error("pnoise parameter should be greater or equal to 1.")
+    if args.pnoise < 0:
+        parser.error("pnoise parameter should be greater or equal to 0.")
     if args.bootstrap != 0 and args.bootstrap != 1:
         parser.error("bootstrap flag should be 0 or 1.")
     if args.tbootstrap <= 0.0 or args.tbootstrap >= 1.0:
         parser.error("tbootstrap should be in range (0, 1).")
     if args.rbootstrap <= 0:
         parser.error("Number of bootstrap resamples should be greater than 0.")
-    if args.epsstop <= 0.0 or args.epsstop > 1:
-        parser.error("epsstop should be in range (0, 1].")
+    if args.amseborder <= 0.0:
+        parser.error("amseborder should be greater than 0.")
     if args.diagplots != 0 and args.diagplots != 1:
         parser.error("diagplots flag should be 0 or 1.")
     if args.verbose != 0 and args.verbose != 1:
@@ -1746,7 +1743,7 @@ def main():
         bootstrap_flag = False
     t_bootstrap = args.tbootstrap
     r_bootstrap = args.rbootstrap
-    eps_stop = args.epsstop
+    amse_border = args.amseborder
     if args.diagplots == 1:
         diagnostic_plots_flag = True
     else:
@@ -1780,19 +1777,12 @@ def main():
             degree, count = line.strip().split(delimiter)
             ordered_data[current_index:current_index + int(count)] = float(degree)
             current_index += int(count)
-    #enforce minimization boundary to the left of min(k) points
-    #set to 10th percentile by default
-    border_value = int(np.ceil(np.percentile(ordered_data, 10)))
-    eps_stop2 = 1 - float(len(ordered_data[np.where(ordered_data <= border_value)]))\
+
+    #enforce minimization boundary to the order statistics larger than border value
+    eps_stop = 1 - float(len(ordered_data[np.where(ordered_data <= amse_border)]))\
                    /len(ordered_data)
-    print "Recommended double-bootstrap epsstop "+\
-          "(based on 10th percentile of the dataset): "+\
-          "%0.2f, see diagnostic plots for more details."\
-          %(eps_stop2-0.01)
-    if eps_stop > eps_stop2 and eps_stop2 > 0.01:
-        eps_stop = np.round(eps_stop2-0.01, decimals=2)
-        print "Epsstop is overwritten..."
-    print "Selected epsstop: %0.4f"%eps_stop
+    print "Selected AMSE border value: %0.4f"%amse_border 
+    print "Selected fraction of order statistics boundary for AMSE minimization: %0.4f"%eps_stop
     print "========================"
     make_plots(ordered_data, args.output_file_path, number_of_bins,
                r_smooth, alpha, hsteps, bootstrap_flag, t_bootstrap,
