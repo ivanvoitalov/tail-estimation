@@ -238,7 +238,6 @@ def hill_dbs(ordered_data, t_bootstrap = 0.5,
             current_amse1 = (M2 - 2.*(M1)**2)**2
             samples_n1 += current_amse1
             good_counts1[np.where(current_amse1 != np.nan)] += 1
-        non_empty_indices = np.where(good_counts1 >= 0.5*n1) #at least half of bootstrap samples wasn't nan
         averaged_delta = samples_n1 / good_counts1
         
         max_index1 = (np.abs(np.linspace(1./n1, 1.0, n1) - eps_stop)).argmin()
