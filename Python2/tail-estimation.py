@@ -10,11 +10,11 @@ from matplotlib import pyplot as plt
 # ========== Auxiliary Functions ==========
 # =========================================
 
-def add_uniform_noise(data_sequence, p = 0):
+def add_uniform_noise(data_sequence, p = 1):
     """
     Function to add uniform random noise to a given dataset.
-    Uniform noise in range [0, 10^p] is added to each
-    data entry.
+    Uniform noise in range [-5*10^(-p), 5*10^(-p)] is added to each
+    data entry. For integer-valued sequences, p = 1.
 
     Args:
         data_sequence: numpy array of data to be processed.
@@ -23,11 +23,13 @@ def add_uniform_noise(data_sequence, p = 0):
     Returns:
         numpy array with noise-added entries.
     """
-    if p < 0:
-        print "Parameter p should be greater or equal to 0."
+    if p < 1:
+        print "Parameter p should be greater or equal to 1."
         return None
-    noise = np.random.uniform(0, 10.**p, size = len(data_sequence))
+    noise = np.random.uniform(-5.*10**(-p), 5*10**(-p), size = len(data_sequence))
     randomized_data_sequence = data_sequence + noise
+    # ensure there are no negative entries after noise is added
+    randomized_data_sequence = randomized_data_sequence[np.where(randomized_data_sequence > 0)]
     return randomized_data_sequence
 
 
@@ -238,6 +240,7 @@ def hill_dbs(ordered_data, t_bootstrap = 0.5,
             good_counts1[np.where(current_amse1 != np.nan)] += 1
         non_empty_indices = np.where(good_counts1 >= 0.5*n1) #at least half of bootstrap samples wasn't nan
         averaged_delta = samples_n1 / good_counts1
+        
         max_index1 = (np.abs(np.linspace(1./n1, 1.0, n1) - eps_stop)).argmin()
         k1 = np.nanargmin(averaged_delta[min_index1:max_index1]) + 1 + min_index1 #take care of indexing
         if diagn_plots:
@@ -258,11 +261,13 @@ def hill_dbs(ordered_data, t_bootstrap = 0.5,
             good_counts2[np.where(current_amse2 != np.nan)] += 1
         max_index2 = (np.abs(np.linspace(1./n2, 1.0, n2) - eps_stop)).argmin()
         averaged_delta = samples_n2 / good_counts2
+        
+        max_index1 = (np.abs(np.linspace(1./n1, 1.0, n1) - eps_stop)).argmin()
         k2 = np.nanargmin(averaged_delta[min_index2:max_index2]) + 1 + min_index2 #take care of indexing
         if diagn_plots:
             n2_amse = averaged_delta
             x2_arr = np.linspace(1./n2, 1.0, n2)
-        
+
         if k2 >= k1:
             print "Warning (Hill): k2 >= k1, AMSE false minimum suspected, resampling..."
             min_index1 = min_index1 + int(0.005*n)
@@ -356,7 +361,6 @@ def hill_estimator(ordered_data,
                            eps_stop = eps_stop)
             k_star, x1_arr, n1_amse, k1, max_index1, x2_arr, n2_amse, k2, max_index2 = results
         xi_star = xi_arr[k_star-1]
-        print "**********"
         print "Adjusted Hill estimated gamma:", 1 + 1./xi_star
         print "**********"
     else:
@@ -649,7 +653,6 @@ def moments_estimator(ordered_data,
                                   eps_stop = eps_stop)
         k_star, x1_arr, n1_amse, k1, max_index1, x2_arr, n2_amse, k2, max_index2 = results
         xi_star = xi_arr[k_star-1]
-        print "**********"
         print "Moments estimated gamma:", 1 + 1./xi_star
         print "**********"
     else:
@@ -976,9 +979,8 @@ def kernel_type_estimator(ordered_data, hsteps, alpha = 0.6,
         k_star = np.argmin(np.abs(h_arr - h_star))
         xi_star = xi_arr[k_star]
         k_arr = []
-        k_star = int(np.floor(h_star * n))
+        k_star = int(np.floor(h_arr[k_star]*n))
         k_arr = np.floor((h_arr * n))
-        print "**********"
         print "Kernel-type estimated gamma:", 1 + 1./xi_star
         print "**********"
     else:
@@ -1216,23 +1218,28 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
             for i in xrange(len(k_k_arr)):
                 f.write(str(k_k_arr[i]) + " " + str(xi_k_arr[i]) + "\n")
         with open(os.path.join(output_dir+"/"+output_name+"_kern_estimate.dat"), "w") as f:
-            f.write(str(k_k_arr[k_k1_star-1]) + " " + str(xi_k_arr[k_k1_star-1]) + "\n")
+            f.write(str(k_k_arr[k_k1_star]) + " " + str(xi_k_arr[k_k1_star]) + "\n")
     
     # plotting part
     if verbose:
         print "Making plots..."
 
     fig, axes = plt.subplots(3, 2, figsize = (12, 16))
+    for ax in axes.reshape(-1):
+        ax.tick_params(direction='out', length=6, width=1.5,
+                       labelsize = 12, which = 'major')
+        ax.tick_params(direction='out', length=3, width=1, which = 'minor')
+        [i.set_linewidth(1.5) for i in ax.spines.itervalues()]
 
     # plot PDF
-    axes[0,0].set_xlabel(r"Degree $k$", fontsize = 15)
-    axes[0,0].set_ylabel(r"$P(k)$", fontsize = 15)
+    axes[0,0].set_xlabel(r"Degree $k$", fontsize = 20)
+    axes[0,0].set_ylabel(r"$P(k)$", fontsize = 20)
     axes[0,0].loglog(x_pdf, y_pdf, color = "#386cb0", marker = "s",
                      lw = 1.5, markeredgecolor = "black")
 
     # plot CCDF
-    axes[0,1].set_xlabel(r"Degree $k$", fontsize = 15)
-    axes[0,1].set_ylabel(r"$P_{c}(k)$", fontsize = 15)
+    axes[0,1].set_xlabel(r"Degree $k$", fontsize = 20)
+    axes[0,1].set_ylabel(r"$\bar{F}(k)$", fontsize = 20)
     axes[0,1].set_xscale("log")
     axes[0,1].set_yscale("log")
     axes[0,1].step(x_ccdf, y_ccdf, color = "#386cb0", lw = 1.5)
@@ -1274,6 +1281,7 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
         xmin = discrete_ordered_data[k_k_star]
     else:
         xmin = ordered_data[k_k_star]
+    
     x = x_ccdf[np.where(x_ccdf >= xmin)]
     l = np.mean(y_ccdf[np.where(x == xmin)])
     alpha = 1./xi_k_star
@@ -1300,8 +1308,8 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
         indices_to_plot_sh = np.where((xi_sh_arr <= 3) & (xi_sh_arr >= -3))
     else:
         indices_to_plot_sh = np.where((k_sh_arr <= max_k) & (k_sh_arr >= min_k))
-    axes[1,0].set_xlabel(r"Number of Order Statistics $\kappa$", fontsize = 15)
-    axes[1,0].set_ylabel(r"Estimated $\hat{\xi}$", fontsize = 15)    
+    axes[1,0].set_xlabel(r"Number of Order Statistics $\kappa$", fontsize = 20)
+    axes[1,0].set_ylabel(r"Estimated $\hat{\xi}$", fontsize = 20)    
     # plot smooth Hill
     
     axes[1,0].plot(k_sh_arr[indices_to_plot_sh], xi_sh_arr[indices_to_plot_sh],
@@ -1326,10 +1334,11 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
                        label = r"$\widehat{\xi}^{Hill}="\
                            +str(np.round([xi_h_arr[k_h_star-1]][0], decimals = 3))\
                            +r"$")
+    axes[1,0].legend(loc = "best")
 
     
-    axes[1,1].set_xlabel(r"Number of Order Statistics $\kappa$", fontsize = 15)
-    axes[1,1].set_ylabel(r"Estimated $\hat{\xi}$", fontsize = 15) 
+    axes[1,1].set_xlabel(r"Number of Order Statistics $\kappa$", fontsize = 20)
+    axes[1,1].set_ylabel(r"Estimated $\hat{\xi}$", fontsize = 20) 
     axes[1,1].set_xscale("log")   
     
     # plot smooth Hill
@@ -1350,8 +1359,8 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
                            +r"$")
     axes[1,1].legend(loc = "best")
 
-    axes[2,0].set_xlabel(r"Number of Order Statistics $\kappa$", fontsize = 15)
-    axes[2,0].set_ylabel(r"Estimated $\hat{\xi}$", fontsize = 15)
+    axes[2,0].set_xlabel(r"Number of Order Statistics $\kappa$", fontsize = 20)
+    axes[2,0].set_ylabel(r"Estimated $\hat{\xi}$", fontsize = 20)
     #plot Pickands
     min_k_index = (np.abs(k_p_arr - min_k)).argmin()
     max_k_index = (np.abs(k_p_arr - max_k)).argmin()
@@ -1403,9 +1412,11 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
                            +str(np.round([xi_k_arr[k_k1_star-1]][0], decimals = 3))\
                            +r"$")
     axes[2,0].legend(loc = "best")
+    # for clarity purposes, display only xi region between -1 and 1
+    axes[2,0].set_ylim((-0.5,1.5))
 
-    axes[2,1].set_xlabel(r"Number of Order Statistics $\kappa$", fontsize = 15)
-    axes[2,1].set_ylabel(r"Estimated $\hat{\xi}$", fontsize = 15)
+    axes[2,1].set_xlabel(r"Number of Order Statistics $\kappa$", fontsize = 20)
+    axes[2,1].set_ylabel(r"Estimated $\hat{\xi}$", fontsize = 20)
     axes[2,1].set_xscale("log")
 
     #plot Pickands
@@ -1434,6 +1445,8 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
                        label = r"$\widehat{\xi}^{Kernel}="\
                            +str(np.round([xi_k_arr[k_k1_star-1]][0], decimals = 3))\
                            +r"$")
+    # for clarity purposes, display only xi region between -1 and 1
+    axes[2,1].set_ylim((-0.5,1.5))
     axes[2,1].legend(loc = "best")
 
     if diagn_plots:
@@ -1591,7 +1604,7 @@ def make_plots(ordered_data, output_file_path, number_of_bins,
         diag_plots_path = output_dir+"/"+output_name+"_diag.pdf"
         fig_d.savefig(diag_plots_path)
 
-    fig.tight_layout()
+    fig.tight_layout(pad = 0.2)
     fig.savefig(output_file_path)
 
 # ==========================
@@ -1627,15 +1640,15 @@ def main():
                         type = int, default = 200)
     parser.add_argument("--noise",
                         help = "Switch on/off uniform noise in range\
-                        [0, 10^p] that is added to each\
+                        [-5*10^(-p), 5*10^(-p)] that is added to each\
                         data point. Used for integer-valued sequences\
-                        with p = 0 (default = 1).",
+                        with p = 1 (default = 1).",
                         type = int, default = 1)
     parser.add_argument("--pnoise",
                         help = "Uniform noise parameter corresponding to\
                         the rounding error of the data sequence. For integer\
-                        values it equals to 0. (default = 0).",
-                        type = int, default = 0)
+                        values it equals to 1. (default = 1).",
+                        type = int, default = 1)
     parser.add_argument("--bootstrap",
                         help = "Flag to switch on/off double-bootstrap\
                         algorithm for defining optimal order statistic\
@@ -1769,6 +1782,7 @@ def main():
         for line in f:
             degree, count = line.strip().split(delimiter)
             N += int(count)
+    print "========== Tail Index Estimation =========="
     print "Number of data entries: %i" % N
     ordered_data = np.zeros(N)
     current_index = 0      
@@ -1781,6 +1795,7 @@ def main():
     #enforce minimization boundary to the order statistics larger than border value
     eps_stop = 1 - float(len(ordered_data[np.where(ordered_data <= amse_border)]))\
                    /len(ordered_data)
+    print "========================"
     print "Selected AMSE border value: %0.4f"%amse_border 
     print "Selected fraction of order statistics boundary for AMSE minimization: %0.4f"%eps_stop
     print "========================"
