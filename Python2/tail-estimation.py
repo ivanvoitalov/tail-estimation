@@ -267,8 +267,9 @@ def hill_dbs(ordered_data, t_bootstrap = 0.5,
             n2_amse = averaged_delta
             x2_arr = np.linspace(1./n2, 1.0, n2)
 
-        if k2 >= k1:
-            print "Warning (Hill): k2 >= k1, AMSE false minimum suspected, resampling..."
+        if k2 > k1:
+            print "Warning (Hill): k2 > k1, AMSE false minimum suspected, resampling..."
+            # move left AMSE boundary to avoid numerical issues
             min_index1 = min_index1 + int(0.005*n)
             min_index2 = min_index2 + int(0.005*n)
             k2 = None
@@ -285,6 +286,10 @@ def hill_dbs(ordered_data, t_bootstrap = 0.5,
     
     k_star = (k1*k1/float(k2)) * rho
     k_star = int(np.round(k_star))
+    
+    # enforce k_star to pick 2nd value (rare cases of extreme cutoffs)
+    if k_star == 0:
+        k_star = 1
     if int(k_star) >= len(ordered_data):
         print "WARNING: estimated threshold k is larger than the size of data"
         k_star = len(ordered_data)-1
