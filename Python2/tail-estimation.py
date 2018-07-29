@@ -282,14 +282,14 @@ def hill_dbs(ordered_data, t_bootstrap = 0.5,
     '''
     
     # this constant is provided in Qi's paper
-    rho = (2.*(np.log(n1)/np.log(k1) - 1.))**(np.log(k1)/np.log(n1) - 1.)
+    rho = (1. - (2*(np.log(k1) - np.log(n1))/(np.log(k1))))**(np.log(k1)/np.log(n1) - 1.)
     
     k_star = (k1*k1/float(k2)) * rho
     k_star = int(np.round(k_star))
     
     # enforce k_star to pick 2nd value (rare cases of extreme cutoffs)
     if k_star == 0:
-        k_star = 1
+        k_star = 2
     if int(k_star) >= len(ordered_data):
         print "WARNING: estimated threshold k is larger than the size of data"
         k_star = len(ordered_data)-1

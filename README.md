@@ -40,11 +40,12 @@ python tail-estimation.py ../Examples/CAIDA_KONECT.dat ./CAIDA_plots.pdf
 
 This will produce a collection of plots saved in the current directory under the "CAIDA_plots.pdf" name as well as some STDOUT messages reporting estimated tail indices. Most users would be interested in just one-number tail index estimates according to three estimators we have implemented so far. They are reported to the STDOUT in the following form (for the CAIDA network example):
 ```
-Adjusted Hill estimated gamma: 2.13430140435
+Adjusted Hill estimated gamma: 2.09917807967
 **********
-Moments estimated gamma: 2.11322173987
+Moments estimated gamma: 2.11472695937
 **********
-Kernel-type estimated gamma: 2.11480741617
+Kernel-type estimated gamma: 2.10970003848
+**********
 ```
 An example of plots generated for the CAIDA network is given below:
 ![CAIDA Output](https://raw.githubusercontent.com/ivanvoitalov/tail-estimation/master/Figures/CAIDA_output.png)
@@ -71,11 +72,11 @@ In the simplest example above, three tail index estimators (Hill, moments and ke
 
 Let us consider an example of in-degree sequence generated from [Libimseti](http://konect.uni-koblenz.de/networks/libimseti) dating website network that is also available under the _Examples_ directory (**Libimseti_in_KONECT.dat** file). Running the script on this sequence produces the following estimates for the distribution exponent:
 ```
-Adjusted Hill estimated gamma: 3.77713046384
+Adjusted Hill estimated gamma: 4.12161848681
 **********
-Moments estimated gamma: 2.56926691826
+Moments estimated gamma: 2.56777932512
 **********
-Kernel-type estimated gamma: 2.66658217789
+Kernel-type estimated gamma: 2.6683297158
 **********
 ```
 
@@ -105,11 +106,11 @@ Fortunately, [it was shown](https://repository.tudelft.nl/islandora/object/uuid:
 
 It is fairly easy to use our code with non-network data, i.e., non-integer-valued data sequences. Simply convert your data to the required input format and switch off the noise by using `--noise 0` flag. We demonstrate this by generating a sequence of Pareto-distributed values with tail exponent <a href="https://www.codecogs.com/eqnedit.php?latex=\gamma&space;=&space;2.5" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\gamma&space;=&space;2.5" title="\gamma = 2.5" /></a>. The data sequence converted to the format used by the script can be found under the _Examples_ directory (**Pareto.dat** file). Estimated tail exponents are very close to the true value:
 ```
-Adjusted Hill estimated gamma: 2.49927490273
+Adjusted Hill estimated gamma: 2.49695935515
 **********
-Moments estimated gamma: 2.53592254037
+Moments estimated gamma: 2.53632638064
 **********
-Kernel-type estimated gamma: 2.56952953349
+Kernel-type estimated gamma: 2.57361570662
 **********
 ```
 The output plots look as follows for this dataset:
