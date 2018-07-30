@@ -983,7 +983,7 @@ def kernel_type_estimator(ordered_data, hsteps, alpha = 0.6,
         k_star = np.argmin(np.abs(h_arr - h_star))
         xi_star = xi_arr[k_star]
         k_arr = []
-        k_star = int(np.floor(h_arr[k_star]*n))
+        k_star = int(np.floor(h_arr[k_star]*n))-1
         k_arr = np.floor((h_arr * n))
         print "Kernel-type estimated gamma:", 1 + 1./xi_star
         print "**********"
