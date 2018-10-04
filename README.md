@@ -4,7 +4,7 @@
 
 This script is intended to be a single-file simple solution to the complex networks degree sequence _tail index estimation_. It consists of several well-established estimators combined into one toolbox along with some useful plotting routines that usually help to analyze a given degree distribution.
 
-If you use this script as a part of your research, we would be grateful if you cite this code repository and/or the original paper (*link to the paper to be added soon*).
+If you use this script as a part of your research, we would be grateful if you cite this code repository and/or the original paper (*link to the paper to be added soon*). Real networks data used in the paper can be found in the _DegreeSequences_ directory.
 
 ## Dependencies
 
