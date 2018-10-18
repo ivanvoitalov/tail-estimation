@@ -657,7 +657,10 @@ def moments_estimator(ordered_data,
                                   eps_stop = eps_stop)
         k_star, x1_arr, n1_amse, k1, max_index1, x2_arr, n2_amse, k2, max_index2 = results
         xi_star = xi_arr[k_star-1]
-        print("Moments estimated gamma:", 1 + 1./xi_star)
+        if xi_star <= 0:
+            print ("Moments estimated gamma: infinity (xi <= 0).")
+        else:
+            print ("Moments estimated gamma:", 1 + 1./xi_star)
         print("**********")
     else:
         k_star, xi_star = None, None
@@ -985,7 +988,10 @@ def kernel_type_estimator(ordered_data, hsteps, alpha = 0.6,
         k_arr = []
         k_star = int(np.floor(h_arr[k_star]*n))-1
         k_arr = np.floor((h_arr * n))
-        print("Kernel-type estimated gamma:", 1 + 1./xi_star)
+        if xi_star <= 0:
+            print ("Kernel-type estimated gamma: infinity (xi <= 0).")
+        else:
+            print ("Kernel-type estimated gamma:", 1 + 1./xi_star)
         print("**********")
     else:
         k_star, xi_star = None, None
