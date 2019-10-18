@@ -261,7 +261,7 @@ def hill_dbs(ordered_data, t_bootstrap = 0.5,
         max_index2 = (np.abs(np.linspace(1./n2, 1.0, n2) - eps_stop)).argmin()
         averaged_delta = samples_n2 / good_counts2
         
-        max_index1 = (np.abs(np.linspace(1./n1, 1.0, n1) - eps_stop)).argmin()
+        
         k2 = np.nanargmin(averaged_delta[min_index2:max_index2]) + 1 + min_index2 #take care of indexing
         if diagn_plots:
             n2_amse = averaged_delta

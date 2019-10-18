@@ -4,7 +4,7 @@
 
 This script is intended to be a single-file simple solution to the complex networks degree sequence _tail index estimation_. It consists of several well-established estimators combined into one toolbox along with some useful plotting routines that usually help to analyze a given degree distribution.
 
-If you use this script as a part of your research, we would be grateful if you cite this code repository and/or the [original paper](https://arxiv.org/abs/1811.02071). Real networks data used in the paper can be found in the _DegreeSequences_ directory.
+If you use this script as a part of your research, we would be grateful if you cite this code repository and/or the [original paper](https://doi.org/10.1103/PhysRevResearch.1.033034). Real networks data used in the paper can be found in the _DegreeSequences_ directory.
 
 ## Dependencies
 
@@ -31,7 +31,7 @@ Here we provide the simplest usage example of the _tail-estimation_ script:
 python tail-estimation.py <path_to_fomatted_degree_sequence> <path_to_output_file>
 ```
 
-Suppose we want to compute the tail exponent of the degree distribution of the [CAIDA network](http://konect.uni-koblenz.de/networks/as-caida20071105) provided by [KONECT database](http://konect.uni-koblenz.de/). Tail exponent is usually denoted by <a href="https://www.codecogs.com/eqnedit.php?latex=\boldsymbol{\gamma}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\boldsymbol{\gamma}" title="\boldsymbol{\gamma}" /></a> and shows that degree distribution can be described as <a href="https://www.codecogs.com/eqnedit.php?latex=P(k)&space;=&space;l(k)&space;k^{-\gamma}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?P(k)&space;=&space;l(k)&space;k^{-\gamma}" title="P(k) = l(k) k^{-\gamma}" /></a>. Here <a href="https://www.codecogs.com/eqnedit.php?latex=l(k)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?l(k)" title="l(k)" /></a> is some _slowly-varying function_, see [the paper](https://arxiv.org/abs/1811.02071) for more details.
+Suppose we want to compute the tail exponent of the degree distribution of the [CAIDA network](http://konect.uni-koblenz.de/networks/as-caida20071105) provided by [KONECT database](http://konect.uni-koblenz.de/). Tail exponent is usually denoted by <a href="https://www.codecogs.com/eqnedit.php?latex=\boldsymbol{\gamma}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\boldsymbol{\gamma}" title="\boldsymbol{\gamma}" /></a> and shows that degree distribution can be described as <a href="https://www.codecogs.com/eqnedit.php?latex=P(k)&space;=&space;l(k)&space;k^{-\gamma}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?P(k)&space;=&space;l(k)&space;k^{-\gamma}" title="P(k) = l(k) k^{-\gamma}" /></a>. Here <a href="https://www.codecogs.com/eqnedit.php?latex=l(k)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?l(k)" title="l(k)" /></a> is some _slowly-varying function_, see [the paper](https://doi.org/10.1103/PhysRevResearch.1.033034) for more details.
 
 We first convert the network from the format of an edge list to the format of _degree counts_ as indicated above. The converted data can be found under the _Examples_ directory (**CAIDA_KONECT.dat** file). Then we run the _tail-estimation.py_ script as follows:
 ```
@@ -50,7 +50,7 @@ Kernel-type estimated gamma: 2.10970003848
 An example of plots generated for the CAIDA network is given below:
 ![CAIDA Output](https://raw.githubusercontent.com/ivanvoitalov/tail-estimation/master/Figures/CAIDA_output.png)
 
-### What does it mean?!
+### What does it mean?
 
 Although at the first glance the plots produced by the script may seem to be complicated, it is very easy to interpret them for your network! 
 
@@ -83,7 +83,7 @@ Kernel-type estimated gamma: 2.6683297158
 While moments and kernel-type estimators produce close estimates, Hill estimator's results is far off from them. From the produced plots we can see that Hill double-bootstrap estimate is placed somewhere very close to the beginning of order statistics of the original sequence, i.e., closer to the tail of the distribution:
 ![Libimseti Output](https://raw.githubusercontent.com/ivanvoitalov/tail-estimation/master/Figures/Libimseti_output.png)
 
-This happens due to the features in the landscape of the estimated asymptotic mean-squared error (AMSE) used in the double-bootstrap algorithm. Simply speaking, every double-bootstrap algorithm used for Hill, moments and kernel-type estimators is using _two consistent estimators_ for the tail index for _two_ bootstrap samples of different sizes. The goal of the algorithm is to find the optimal order statistics <a href="https://www.codecogs.com/eqnedit.php?latex=\kappa_1^{\ast}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\kappa_1^{\ast}" title="\kappa_1^{\ast}" /></a>, <a href="https://www.codecogs.com/eqnedit.php?latex=\kappa_2^{\ast}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\kappa_2^{\ast}" title="\kappa_2^{\ast}" /></a> that correspond to the AMSE minima of the 1st and 2nd bootstrap samples respectively. Based on these two order statistics, the optimal tail index is found. For more details on the double-bootstrap method, please see [the paper](https://arxiv.org/abs/1811.02071).
+This happens due to the features in the landscape of the estimated asymptotic mean-squared error (AMSE) used in the double-bootstrap algorithm. Simply speaking, every double-bootstrap algorithm used for Hill, moments and kernel-type estimators is using _two consistent estimators_ for the tail index for _two_ bootstrap samples of different sizes. The goal of the algorithm is to find the optimal order statistics <a href="https://www.codecogs.com/eqnedit.php?latex=\kappa_1^{\ast}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\kappa_1^{\ast}" title="\kappa_1^{\ast}" /></a>, <a href="https://www.codecogs.com/eqnedit.php?latex=\kappa_2^{\ast}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\kappa_2^{\ast}" title="\kappa_2^{\ast}" /></a> that correspond to the AMSE minima of the 1st and 2nd bootstrap samples respectively. Based on these two order statistics, the optimal tail index is found. For more details on the double-bootstrap method, please see [the paper](https://doi.org/10.1103/PhysRevResearch.1.033034).
 
 In Hill estimator's case, these two estimators are first- and second-moment tail index estimators; in moments case, these are second- and third-moments estimators; in kernel-type case, these are biweight and triweight kernel-type estimators. The difference between consistent estimators for Hill, moments and kernel-type estimators produce different AMSE landscapes with minima that do not necessarily coincide. This can be seen on the **diagnostic plots** that can be produced by the script by providing _--diagplots 1_ in the console as follows:
 ```
